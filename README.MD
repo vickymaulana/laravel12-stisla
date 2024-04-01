@@ -60,20 +60,20 @@ This repository contains a Laravel 11 template that comes pre-configured with au
 ### Special Thanks
 I extend my gratitude to all the interns at LLDIKTI 2 Division of Information System Development for their contributions and support.
 
-- [Ahmad Dimas](https://github.com/anqois)
-- [Abdilah Khalid](https://github.com/KhalidUnsri)
-- [Haikal Albana](https://github.com/HaikalAlbanna)
+- [Ahmad Dimas Aldian Al-furqon](https://github.com/anqois)
+- [Abdillah Khalid](https://github.com/KhalidUnsri)
+- [Haikal Tirta Albanna](https://github.com/HaikalAlbanna)
 - [Meta Berliana](https://github.com/Metabrln)
 - [Imelda Triadmajaya](https://github.com/imeldatriajaya)
-- [Hilwa Izatinafisah](https://github.com/ksnwaa)
-- [Triyana Sugiarti](https://github.com/TriyanaSgi)
-- [Adelia Isni](https://github.com/lilisky07)
+- [Hilwa Izzatinnafisah](https://github.com/ksnwaa)
+- [Triyana Sugiyarti](https://github.com/TriyanaSgi)
+- [Adelia Isni Hendrawan Putri](https://github.com/lilisky07)
 - [Siti Nur Azizah](https://github.com/sukasukajija)
-- [Husaini Hasyim](https://github.com/son-alone)
+- [M. Husaini Hasyim](https://github.com/son-alone)
 - [Andre Satriawan](https://github.com/andresa11satriawan)
 - [Lathifah Putri Aresti](https://github.com/lathifahputri)
 - [Sisca Amelia](https://github.com/siscaamelia)
-- [Denny Trilisandi](https://github.com/Koutsura)
+- [M. Denny Tri Lisandi](https://github.com/Koutsura)
 
 Feel free to explore their repositories as well.
 
