@@ -8,7 +8,7 @@ This repository contains a Laravel 11 template that comes pre-configured with au
 ## Installation Guide
 
 ### Prerequisites
-- PHP >= 8.1
+- PHP >= 8.2
 - Composer
 - Node.js
 - npm
