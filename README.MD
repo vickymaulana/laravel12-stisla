@@ -80,3 +80,25 @@ Feel free to explore their repositories as well.
 ---
 
 If you encounter any issues or have suggestions for improvements, please feel free to open an issue or submit a pull request. Thank you for your interest and support!
+
+### Image Screenshots
+
+Register Page
+
+![Register Page](img/register.png "Register Page")
+
+Login Page
+
+![Login Page](img/login.png "Login Page")
+
+Dashboard Page
+
+![Dashboard Page](img/dashboard.png "Dashboard Page")
+
+Blank Page
+
+![Blank Page](img/blank.png "Blank Page")
+
+Edit User Profile Page
+
+![Edit User Profile Page](img/edit.png "Edit User Profile Page")
