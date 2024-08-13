@@ -12,6 +12,12 @@
             <li class="{{ Request::is('home') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('home') }}"><i class="fas fa-fire"></i><span>Dashboard</span></a>
             </li>
+            @if (Auth::user()->role == 'superadmin')
+            <li class="menu-header">Hak Akses</li>
+            <li class="{{ Request::is('hakakses') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ url('hakakses') }}"><i class="fas fa-user-shield"></i> <span>Hak Akses</span></a>
+            </li>
+            @endif
             <!-- profile ganti password -->
             <li class="menu-header">Profile</li>
             <li class="{{ Request::is('profile/edit') ? 'active' : '' }}">
