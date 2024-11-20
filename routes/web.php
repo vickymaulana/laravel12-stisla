@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ExampleController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,4 +23,16 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/hakakses/update/{id}', [App\Http\Controllers\HakaksesController::class, 'update'])->name('hakakses.update')->middleware('superadmin');
     Route::delete('/hakakses/delete/{id}', [App\Http\Controllers\HakaksesController::class, 'destroy'])->name('hakakses.delete')->middleware('superadmin');
 
+    Route::get('/table-example', [App\Http\Controllers\ExampleController::class, 'table'])->name('table.example');
+    Route::get('/clock-example', [App\Http\Controllers\ExampleController::class, 'clock'])->name('clock.example');
+    Route::get('/chart-example', [App\Http\Controllers\ExampleController::class, 'chart'])->name('chart.example');
+    Route::get('/form-example', [App\Http\Controllers\ExampleController::class, 'form'])->name('form.example');
+    Route::get('/map-example', [App\Http\Controllers\ExampleController::class, 'map'])->name('map.example');
+    Route::get('/calendar-example', [App\Http\Controllers\ExampleController::class, 'calendar'])->name('calendar.example');
+    Route::get('/gallery-example', [App\Http\Controllers\ExampleController::class, 'gallery'])->name('gallery.example');
+    Route::get('/todo-example', [App\Http\Controllers\ExampleController::class, 'todo'])->name('todo.example');
+    Route::get('/contact-example', [App\Http\Controllers\ExampleController::class, 'contact'])->name('contact.example');
+    Route::get('/faq-example', [App\Http\Controllers\ExampleController::class, 'faq'])->name('faq.example');
+    Route::get('/news-example', [App\Http\Controllers\ExampleController::class, 'news'])->name('news.example');
+    Route::get('/about-example', [App\Http\Controllers\ExampleController::class, 'about'])->name('about.example');
 });
