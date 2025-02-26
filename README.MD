@@ -1,12 +1,12 @@
-# Laravel 11 with Stisla Template
+# laravel 12 with Stisla Template
 
-Welcome to the repository for Laravel 11 integrated with Stisla Bootstrap 5 template!
+Welcome to the repository for laravel 12 integrated with Stisla Bootstrap 5 template!
 
 ## Overview
-This repository contains a Laravel 11 template that comes pre-configured with authentication from Breeze and utilizes the Stisla Bootstrap 5 template for the UI. It includes various features to help you quickly set up a robust web application.
+This repository contains a laravel 12 template that comes pre-configured with authentication from Breeze and utilizes the Stisla Bootstrap 5 template for the UI. It includes various features to help you quickly set up a robust web application.
 
 ## Features
-- Laravel 11
+- laravel 12
 - Stisla Bootstrap 5 Template
 - Authentication with Laravel Breeze
 - User Profile Management
