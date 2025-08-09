@@ -19,6 +19,7 @@ class HakaksesController extends Controller
         } else {
             $data['hakakses'] = hakakses::all();
         }
+
         return view('layouts.hakakses.index', $data);
     }
 
@@ -53,6 +54,7 @@ class HakaksesController extends Controller
     {
         //
         $hakakses = hakakses::find($id);
+
         return view('layouts.hakakses.edit', compact('hakakses'));
     }
 
@@ -65,6 +67,7 @@ class HakaksesController extends Controller
         $hakakses = hakakses::find($id);
         $hakakses->role = $request->role;
         $hakakses->save();
+
         return redirect()->route('hakakses.index');
     }
 

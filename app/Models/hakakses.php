@@ -10,5 +10,6 @@ class hakakses extends Model
     use HasFactory;
 
     protected $table = 'users';
+
     protected $fillable = ['role'];
 }
