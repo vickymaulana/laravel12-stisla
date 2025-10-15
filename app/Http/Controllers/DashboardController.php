@@ -24,8 +24,9 @@ class DashboardController extends Controller
         $geojson_chart_array = [];
 	    foreach ($my_files as $my_file) {
             $file = $my_file['filename'];
-                $geojson_array[] = ['filename' => preg_replace('/[^A-Za-z0-9\_\.]/', '', basename($file))]; //$geojson_array[] = geojson_array.append()
-            }
+            $geojson_array[] = ['filename' => preg_replace('/[^A-Za-z0-9\_\.]/', '', basename($file))]; //$geojson_array[] = geojson_array.append()
+        }
+
 	    # Get Generalized Dashboard
         $dashboard_info = Dashboard::where('user_id', '=', $userId)
             ->where('id', '=', $id)
@@ -55,36 +56,49 @@ class DashboardController extends Controller
                     ->where('filename', '=', $get_map_filename)
                     ->where('user_id', '=', $userId)
                     ->get();
-                $json_version = json_decode($geojson->value('geojson'), true);
+                $json_version = json_decode($geojson->value('geojson'), true) ?? ['features' => []];
 
-                if ($decode_metadata['y_axis'] == 'COUNT') { # Handle Count
+                // Normalize the Y selection. UI sends labels like "COUNT" or "SUM FieldName".
+                [$agg, $yField] = $this->normalizeYAxis($decode_metadata['y_axis'] ?? 'COUNT');
+                $xField = $decode_metadata['x_axis'] ?? null;
+
+                if ($agg === 'COUNT') { # Handle Count
                     foreach ($json_version['features'] as $feature) {
-                        if (!isset($values_md[$feature['properties'][$decode_metadata['x_axis']]])) {
-                            $values_md[$feature['properties'][$decode_metadata['x_axis']]] = 1;
+                        $key = $feature['properties'][$xField] ?? null;
+                        if ($key === null) continue;
+                        if (!isset($values_md[$key])) {
+                            $values_md[$key] = 1;
                         } else {
-                            $values_md[$feature['properties'][$decode_metadata['x_axis']]] = $values_md[$feature['properties'][$decode_metadata['x_axis']]] + 1;
+                            $values_md[$key] = $values_md[$key] + 1;
                         }
                     }
                     $labels = array_keys($values_md);
                     if ($get_widget['widget_type_id'] == 4) { # Piecharts don't like labels to be numberical, so convert them all
-                        $labels = array_map(function($value) {
-                            return (string)$value;
-                        }, $labels);
+                        $labels = array_map(function($value) { return (string)$value; }, $labels);
                     }
                     $values = array_values($values_md);
 
-                } else { # Handle Sum
-
+                } else { # Handle Sum (aggregate = SUM, field = $yField)
                     foreach ($json_version['features'] as $feature) {
-                        if (!isset($values_md[$feature['properties'][$decode_metadata['x_axis']]])) {
-                            $values_md[$feature['properties'][$decode_metadata['x_axis']]] = $feature['properties'][$decode_metadata['y_axis']];
+                        $key = $feature['properties'][$xField] ?? null;
+                        if ($key === null) continue;
+
+                        $raw = $feature['properties'][$yField] ?? null;
+                        if (!is_numeric($raw)) continue; // skip headers/strings/nulls
+                        $val = (float)$raw;
+
+                        if (!isset($values_md[$key])) {
+                            $values_md[$key] = $val;
                         } else {
-                            $values_md[$feature['properties'][$decode_metadata['x_axis']]] = $values_md[$feature['properties'][$decode_metadata['x_axis']]] + $feature['properties'][$decode_metadata['y_axis']];
+                            $values_md[$key] += $val;
                         }
                     }
                     $labels = array_keys($values_md);
+                    if ($get_widget['widget_type_id'] == 4) {
+                        // Keep it consistent for pies
+                        $labels = array_map(fn($v) => (string)$v, $labels);
+                    }
                     $values = array_values($values_md);
-
                 }
 
                 $chart_types = [2 => 'line', 3 => 'bar', 4 => 'pie', 5 => 'table']; # TODO: Add the chart value name to the database as a column instead of this
@@ -94,20 +108,24 @@ class DashboardController extends Controller
                     $label_location = 'top';
                 }
 
+                // Build dataset; give pies explicit colors so slices show up nicely
+                $dataset = [
+                    "label" => $decode_metadata['x_axis'] ?? '',
+                    "data" => $values,
+                    "fill" => true, //calculus (y/n)
+                    "pointRadius" => 0,
+                    "borderWidth" => 1,
+                ];
+                if ($get_widget['widget_type_id'] == 4) {
+                    $dataset["backgroundColor"] = $this->makeColors(count($labels));
+                }
+
                 $chart = Chartjs::build() //makes empty chart
                     ->name("Chart".Str::random()) //fill da chart!!!! with what we just did!!!!!!!
                     ->type($chart_types[$get_widget['widget_type_id']])
                     ->size(['width' => 400, 'height' => 200]) 
                     ->labels($labels)
-                    ->datasets([
-                        [
-                            "label" => $decode_metadata['x_axis'],
-                            "data" => $values,
-                            "fill" => true, //calculus (y/n)
-                            "pointRadius" => 0,
-                            "borderWidth" => 1,
-                        ]
-                    ])
+                    ->datasets([$dataset])
                     ->options([
                         "interaction" =>[
                             "mode" => "nearest", // or 'index'
@@ -125,14 +143,7 @@ class DashboardController extends Controller
                         "responsive" => true,
                         "maintainAspectRatio" => false, // This is true by default
                     ]);
-                    //->options([]);
-                    // ->options([
-                    //     "scales" => [
-                    //         "y" => [
-                    //             "beginAtZero" => true
-                    //             ]
-                    //         ]
-                    // ]);
+
                 $get_widget['chart'] = $chart;
             }
 	    }
@@ -221,6 +232,7 @@ class DashboardController extends Controller
         $widgets_to_del->delete();
         return redirect()->route('home');
     }
+
     public function updateBounds(Request $request) {
         $request->validate([
             'widget_id' => ['required', 'integer'],
@@ -245,10 +257,10 @@ class DashboardController extends Controller
 
         $meta = json_decode($widget->metadata, true);
         $xAxis = $meta['x_axis'] ?? null;
-        $yAxis = $meta['y_axis'] ?? null;
+        [$agg, $yField] = $this->normalizeYAxis($meta['y_axis'] ?? 'COUNT');
         $mapFilename = $meta['map_filename'] ?? null;
 
-        if (!$xAxis || !$yAxis || !$mapFilename) {
+        if (!$xAxis || !$yField || !$mapFilename) {
             return response()->json(['labels' => [], 'datasets' => []]);
         }
 
@@ -285,9 +297,9 @@ class DashboardController extends Controller
             }
         }
 
-        // 5) Recompute chart data (same logic as show_dashboard)
+        // 5) Recompute chart data (mirrors show_dashboard)
         $values_md = [];
-        if (strtoupper($yAxis) === 'COUNT') {
+        if ($agg === 'COUNT') {
             foreach ($filtered as $f) {
                 $key = $f['properties'][$xAxis] ?? null;
                 if ($key === null) continue;
@@ -299,67 +311,105 @@ class DashboardController extends Controller
                 $labels = array_map(fn($v) => (string)$v, $labels);
             }
             $values = array_values($values_md);
-        } else {
+        } else { // SUM
             foreach ($filtered as $f) {
                 $key = $f['properties'][$xAxis] ?? null;
-                $val = $f['properties'][$yAxis] ?? null;
+                $raw = $f['properties'][$yField] ?? null;
                 if ($key === null) continue;
-                if (!is_numeric($val)) continue;
-                if (!isset($values_md[$key])) $values_md[$key] = (float)$val;
-                else $values_md[$key] += (float)$val;
+                if (!is_numeric($raw)) continue;
+                $val = (float)$raw;
+                if (!isset($values_md[$key])) $values_md[$key] = $val;
+                else $values_md[$key] += $val;
             }
             $labels = array_keys($values_md);
+            if ($widget->widget_type_id == 4) {
+                $labels = array_map(fn($v) => (string)$v, $labels);
+            }
             $values = array_values($values_md);
         }
 
+        $dataset = [
+            'label' => $xAxis,
+            'data'  => $values,
+            'fill'  => true,
+            'pointRadius' => 0,
+            'borderWidth' => 1,
+        ];
+        if ($widget->widget_type_id == 4) {
+            $dataset['backgroundColor'] = $this->makeColors(count($labels));
+        }
+
         return response()->json([
-            'labels' => $labels,
-            'datasets' => [[
-                'label' => $xAxis,
-                'data'  => $values,
-                'fill'  => true,
-                'pointRadius' => 0,
-                'borderWidth' => 1,
-            ]],
+            'labels'   => $labels,
+            'datasets' => [ $dataset ],
         ]);
     }
 
-/**
- * Representative point for a feature.
- * - Point → that point.
- * - Polygon/MultiPolygon → first ring’s first coord (simple/fast).
- *   (For production accuracy, compute real centroid/intersection or use PostGIS.)
- */
-private function featureRepresentativePoint(array $feature): ?array
-{
-    $geom = $feature['geometry'] ?? null;
-    if (!$geom || !isset($geom['type'])) return null;
+    /**
+     * Normalize a y_axis selection like "COUNT" or "SUM Foo" into [agg, field].
+     * Returns ['COUNT','COUNT'] for COUNT to make branching easy.
+     */
+    private function normalizeYAxis(?string $raw): array
+    {
+        $raw = trim((string)$raw);
+        if (strtoupper($raw) === 'COUNT') {
+            return ['COUNT', 'COUNT'];
+        }
+        if (stripos($raw, 'SUM ') === 0) {
+            return ['SUM', trim(substr($raw, 4))];
+        }
+        // If UI ever passes just a field name, treat as SUM of that field
+        return ['SUM', $raw];
+    }
 
-    if ($geom['type'] === 'Point') {
-        $c = $geom['coordinates'] ?? null;
-        if (is_array($c) && count($c) >= 2) {
+    /**
+     * Representative point for a feature.
+     * - Point → that point.
+     * - Polygon/MultiPolygon → first ring’s first coord (simple/fast).
+     *   (For production accuracy, compute real centroid/intersection or use PostGIS.)
+     */
+    private function featureRepresentativePoint(array $feature): ?array
+    {
+        $geom = $feature['geometry'] ?? null;
+        if (!$geom || !isset($geom['type'])) return null;
+
+        if ($geom['type'] === 'Point') {
+            $c = $geom['coordinates'] ?? null;
+            if (is_array($c) && count($c) >= 2) {
+                return ['lat' => (float)$c[1], 'lng' => (float)$c[0]];
+            }
+        }
+
+        if ($geom['type'] === 'Polygon' && !empty($geom['coordinates'][0][0])) {
+            $c = $geom['coordinates'][0][0];
             return ['lat' => (float)$c[1], 'lng' => (float)$c[0]];
         }
+
+        if ($geom['type'] === 'MultiPolygon' && !empty($geom['coordinates'][0][0][0])) {
+            $c = $geom['coordinates'][0][0][0];
+            return ['lat' => (float)$c[1], 'lng' => (float)$c[0]];
+        }
+
+        // TODO: handle LineString/MultiLineString if needed
+        return null;
     }
 
-    if ($geom['type'] === 'Polygon' && !empty($geom['coordinates'][0][0])) {
-        $c = $geom['coordinates'][0][0];
-        return ['lat' => (float)$c[1], 'lng' => (float)$c[0]];
+    private function makeColors(int $n): array
+    {
+        if ($n <= 0) return [];
+        $colors = [];
+        $step = max(1, intdiv(360, max(6, min(24, $n))));
+        $h = 0;
+        for ($i = 0; $i < $n; $i++) {
+            $colors[] = sprintf('hsl(%d, 65%%, 55%%)', $h);
+            $h = ($h + $step) % 360;
+        }
+        return $colors;
     }
 
-    if ($geom['type'] === 'MultiPolygon' && !empty($geom['coordinates'][0][0][0])) {
-        $c = $geom['coordinates'][0][0][0];
-        return ['lat' => (float)$c[1], 'lng' => (float)$c[0]];
+    private function pointInBounds(float $lat, float $lng, float $south, float $west, float $north, float $east): bool
+    {
+        // no anti-meridian handling (keep it simple)
+        return $lat >= $south && $lat <= $north && $lng >= $west && $lng <= $east;
     }
-
-    // TODO: handle LineString/MultiLineString if needed
-    return null;
-}
-
-private function pointInBounds(float $lat, float $lng, float $south, float $west, float $north, float $east): bool
-{
-    // no anti-meridian handling (keep it simple)
-    return $lat >= $south && $lat <= $north && $lng >= $west && $lng <= $east;
-}
-
 }
