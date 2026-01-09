@@ -17,3 +17,24 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Editor Files
+*.swp
+*.swo
+*~
+
+# Build Files
+/dist
+/build
+
+# Database
+*.sqlite
+*.sqlite-journal
+database/*.sqlite
+
+# Logs
+*.log
