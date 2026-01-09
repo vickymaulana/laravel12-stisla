@@ -1,29 +1,33 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
-
-use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
 
 class ResetPasswordController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Password Reset Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller is responsible for handling password reset requests
-    | and uses a simple trait to include this behavior. You're free to
-    | explore this trait and override any methods you wish to tweak.
-    |
-    */
+    public function reset(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|confirmed',
+        ]);
 
-    use ResetsPasswords;
+        // If OTP method is enabled
+        if (env('PASSWORD_RESET_METHOD') === 'otp') {
+            $otp = session('otp');
 
-    /**
-     * Where to redirect users after resetting their password.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
+            if ($request->otp !== $otp) {
+                return back()->withErrors(['otp' => 'The OTP provided is incorrect.']);
+            }
+        }
+
+        // Proceed with resetting the password if everything is valid
+        $user = User::where('email', $request->email)->first();
+        if ($user) {
+            $user->password = bcrypt($request->password);
+            $user->save();
+        }
+
+        return redirect()->route('login')->with('status', 'Password reset successful.');
+    }
 }
