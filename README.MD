@@ -30,6 +30,12 @@ A modern, production-ready Laravel 12 admin panel template integrated with the b
 - ✅ **OTP Password Reset** - Secure password recovery via email
 - ✅ **Responsive Design** - Mobile-first approach with Bootstrap 5.3
 
+### 🎉 New Advanced Features
+- 📝 **Activity Log System** - Track all user activities and system events
+- 🔧 **Settings Management** - Manage application settings from admin panel
+- 🔔 **Notification System** - Send and manage in-app notifications
+- 📁 **File Manager** - Upload, organize, and manage files with visual interface
+
 ### UI Components & Examples
 - 📊 **Dashboard** - Modern admin dashboard
 - 📋 **Data Tables** - Interactive tables with sorting and filtering
@@ -151,7 +157,21 @@ DB_PASSWORD=your_password
 php artisan migrate
 ```
 
-### 7. Build Frontend Assets
+### 7. Seed Default Settings (Optional)
+
+```bash
+# Seed default application settings
+php artisan db:seed --class=SettingSeeder
+```
+
+### 8. Create Storage Link
+
+```bash
+# Required for File Manager to work properly
+php artisan storage:link
+```
+
+### 9. Build Frontend Assets
 
 ```bash
 # Development mode (with hot reload)
@@ -161,7 +181,7 @@ npm run dev
 npm run build
 ```
 
-### 8. Start the Development Server
+### 10. Start the Development Server
 
 ```bash
 php artisan serve
@@ -169,7 +189,7 @@ php artisan serve
 
 Visit **http://localhost:8000** in your browser! 🎉
 
-### 9. Register Your First User
+### 11. Register Your First User
 
 1. Navigate to `http://localhost:8000/register`
 2. Fill in your details:
@@ -188,18 +208,29 @@ laravel12-stisla/
 ├── app/
 │   ├── Http/
 │   │   ├── Controllers/         # Application controllers
-│   │   │   ├── ProfileController.php    # User profile management
-│   │   │   ├── HomeController.php       # Dashboard controller
-│   │   │   ├── HakaksesController.php   # Access rights management
-│   │   │   └── ExampleController.php    # Template examples
+│   │   │   ├── ProfileController.php        # User profile management
+│   │   │   ├── HomeController.php           # Dashboard controller
+│   │   │   ├── HakaksesController.php       # Access rights management
+│   │   │   ├── ExampleController.php        # Template examples
+│   │   │   ├── ActivityLogController.php    # Activity log management
+│   │   │   ├── SettingController.php        # Settings management
+│   │   │   ├── NotificationController.php   # Notifications handling
+│   │   │   └── FileManagerController.php    # File manager operations
 │   │   └── Middleware/          # Custom middleware
 │   │
 │   ├── Models/                  # Eloquent models
 │   │   ├── User.php            # User model with auth
-│   │   └── hakakses.php        # Access rights model
+│   │   ├── hakakses.php        # Access rights model
+│   │   ├── ActivityLog.php     # Activity log model
+│   │   ├── Setting.php         # Settings model
+│   │   └── File.php            # File manager model
 │   │
-│   └── Notifications/           # Email notifications
-│       └── OtpPasswordResetNotification.php
+│   ├── Notifications/           # Email & in-app notifications
+│   │   ├── OtpPasswordResetNotification.php
+│   │   └── GeneralNotification.php          # General purpose notifications
+│   │
+│   └── Helpers/                 # Helper classes
+│       └── ActivityLogger.php  # Activity logging helper
 │
 ├── config/                      # Configuration files
 ├── database/
@@ -288,6 +319,70 @@ The `web.php` file shows:
 - ✅ How to stack multiple middleware
 - ✅ How to create route groups
 
+#### Activity Log Example
+
+The `ActivityLog.php` model shows:
+- ✅ How to create helper methods in models
+- ✅ How to use morph relationships
+- ✅ How to implement custom logging
+- ✅ How to track user activities automatically
+
+#### Settings Management Example
+
+The `Setting.php` model demonstrates:
+- ✅ How to use cache for better performance
+- ✅ How to create flexible configuration systems
+- ✅ How to implement helper methods for easy data access
+- ✅ How to handle different data types
+
+#### Notification System Example
+
+The `NotificationController.php` shows:
+- ✅ How to send database notifications
+- ✅ How to mark notifications as read
+- ✅ How to paginate results
+- ✅ How to use Laravel's notification system
+
+#### File Manager Example
+
+The `FileManagerController.php` demonstrates:
+- ✅ How to handle file uploads
+- ✅ How to store files with Laravel Storage
+- ✅ How to create dynamic file filtering
+- ✅ How to implement file organization systems
+
+#### Activity Log Example
+
+The `ActivityLog.php` model shows:
+- ✅ How to create helper methods in models
+- ✅ How to use morph relationships
+- ✅ How to implement custom logging
+- ✅ How to track user activities automatically
+
+#### Settings Management Example
+
+The `Setting.php` model demonstrates:
+- ✅ How to use cache for better performance
+- ✅ How to create flexible configuration systems
+- ✅ How to implement helper methods for easy data access
+- ✅ How to handle different data types
+
+#### Notification System Example
+
+The `NotificationController.php` shows:
+- ✅ How to send database notifications
+- ✅ How to mark notifications as read
+- ✅ How to paginate results
+- ✅ How to use Laravel's notification system
+
+#### File Manager Example
+
+The `FileManagerController.php` demonstrates:
+- ✅ How to handle file uploads
+- ✅ How to store files with Laravel Storage
+- ✅ How to create dynamic file filtering
+- ✅ How to implement file organization systems
+
 ### Recommended Learning Path
 
 1. **Start with Routes** - `routes/web.php`
@@ -309,6 +404,70 @@ The `web.php` file shows:
 5. **Practice with Examples**
    - Try the example pages (charts, tables, forms)
    - Modify them to create your own features
+
+6. **Explore New Features**
+   - See `NEW_FEATURES.md` for detailed documentation
+   - Test Activity Logs to track system events
+   - Try the File Manager for file uploads
+   - Send notifications to users
+   - Customize Settings from the admin panel
+
+## 🎯 New Features Usage
+
+### Activity Log System
+
+```php
+use App\Models\ActivityLog;
+
+// Log a simple activity
+ActivityLog::log('User performed an action', 'Subject', 'custom');
+
+// Log with model reference
+ActivityLog::log('Product created', 'Products', 'created', $product);
+```
+
+### Settings Management
+
+```php
+use App\Models\Setting;
+
+// Get a setting value
+$appName = Setting::get('app_name', 'Default App');
+
+// Set a setting value
+Setting::set('app_name', 'My Application', 'text');
+```
+
+### Send Notifications
+
+```php
+use App\Notifications\GeneralNotification;
+
+// Send notification to a user
+$user->notify(new GeneralNotification(
+    'Welcome!',
+    'Welcome to our application',
+    route('home'),
+    'Go to Dashboard',
+    'success'
+));
+```
+
+### File Manager
+
+```php
+use App\Models\File;
+
+// Get user files
+$files = File::where('user_id', auth()->id())->get();
+
+// Check if file is an image
+if ($file->isImage()) {
+    echo '<img src="' . $file->url . '">';
+}
+```
+
+For complete documentation of new features, see **[NEW_FEATURES.md](NEW_FEATURES.md)**.
 
 ## 🔧 Common Tasks
 
@@ -337,6 +496,18 @@ php artisan cache:clear
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear
+```
+
+### Seed Default Settings
+
+```bash
+php artisan db:seed --class=SettingSeeder
+```
+
+### Create Storage Link
+
+```bash
+php artisan storage:link
 ```
 
 ### Code Style Fixing
