@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
+use App\Exports\ActivityLogsExport;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ActivityLogController extends Controller
 {
@@ -82,5 +84,13 @@ class ActivityLogController extends Controller
 
         return redirect()->route('activity-logs.index')
             ->with('error', 'Confirmation required to clear all logs.');
+    }
+
+    /**
+     * Export activity logs to Excel.
+     */
+    public function export()
+    {
+        return Excel::download(new ActivityLogsExport, 'activity-logs-' . now()->format('Y-m-d-His') . '.xlsx');
     }
 }

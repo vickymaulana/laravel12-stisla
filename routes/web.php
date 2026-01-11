@@ -37,6 +37,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Activity Logs Routes
     Route::get('/activity-logs', [App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index')->middleware('superadmin');
+    Route::get('/activity-logs/export/excel', [App\Http\Controllers\ActivityLogController::class, 'export'])->name('activity-logs.export')->middleware('superadmin');
     Route::get('/activity-logs/{id}', [App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-logs.show')->middleware('superadmin');
     Route::delete('/activity-logs/{id}', [App\Http\Controllers\ActivityLogController::class, 'destroy'])->name('activity-logs.destroy')->middleware('superadmin');
     Route::delete('/activity-logs', [App\Http\Controllers\ActivityLogController::class, 'clear'])->name('activity-logs.clear')->middleware('superadmin');
@@ -65,4 +66,7 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/file-manager/{id}', [App\Http\Controllers\FileManagerController::class, 'destroy'])->name('file-manager.destroy');
     Route::get('/file-manager/{id}/show', [App\Http\Controllers\FileManagerController::class, 'show'])->name('file-manager.show');
     Route::post('/file-manager/create-folder', [App\Http\Controllers\FileManagerController::class, 'createFolder'])->name('file-manager.create-folder');
+
+    // System Info Route (Superadmin only)
+    Route::get('/system-info', [App\Http\Controllers\SystemInfoController::class, 'index'])->name('system-info.index')->middleware('superadmin');
 });

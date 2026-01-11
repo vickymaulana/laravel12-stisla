@@ -97,6 +97,9 @@
                             <div class="card-header">
                                 <h4>Activity Logs</h4>
                                 <div class="card-header-action">
+                                    <a href="{{ route('activity-logs.export') }}" class="btn btn-success">
+                                        <i class="fas fa-file-excel"></i> Export to Excel
+                                    </a>
                                     <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#clearLogsModal">
                                         <i class="fas fa-trash"></i> Clear All Logs
                                     </button>

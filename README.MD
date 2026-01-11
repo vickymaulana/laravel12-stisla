@@ -36,6 +36,12 @@ A modern, production-ready Laravel 12 admin panel template integrated with the b
 - 🔔 **Notification System** - Send and manage in-app notifications
 - 📁 **File Manager** - Upload, organize, and manage files with visual interface
 
+### 🛠️ Helper Features (NEW!)
+- 📊 **Excel Export** - Export activity logs to Excel format
+- 🖥️ **System Info Dashboard** - View comprehensive system information
+- 🚀 **Quick Setup Command** - Automated first-time setup wizard
+- 📚 **Comprehensive Documentation** - Step-by-step guides and examples
+
 ### UI Components & Examples
 - 📊 **Dashboard** - Modern admin dashboard
 - 📋 **Data Tables** - Interactive tables with sorting and filtering
@@ -108,6 +114,31 @@ npm -v
 ```
 
 ## 🚀 Quick Start
+
+### Option A: Automated Setup (Recommended)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/vickymaulana/laravel12-stisla.git
+cd laravel12-stisla
+
+# 2. Install dependencies
+composer install
+npm install
+
+# 3. Run the quick setup wizard
+php artisan setup:quick
+
+# 4. Build frontend assets
+npm run dev
+
+# 5. Start the server
+php artisan serve
+```
+
+Visit **http://localhost:8000** in your browser! 🎉
+
+### Option B: Manual Setup
 
 ### 1. Clone the Repository
 
@@ -467,9 +498,17 @@ if ($file->isImage()) {
 }
 ```
 
-For complete documentation of new features, see **[NEW_FEATURES.md](NEW_FEATURES.md)**.
+For complete documentation of new features, see **[NEW_FEATURES.md](NEW_FEATURES.md)**.  
+For helper features and tools, see **[HELPER_FEATURES.md](HELPER_FEATURES.md)**.
 
 ## 🔧 Common Tasks
+
+### Quick Setup (New Users)
+
+```bash
+# Run automated setup wizard
+php artisan setup:quick
+```
 
 ### Create a New Controller
 

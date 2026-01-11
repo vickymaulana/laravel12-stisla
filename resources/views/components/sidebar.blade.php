@@ -42,6 +42,9 @@
             <li class="{{ Request::is('settings*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('settings.index') }}"><i class="fas fa-cog"></i> <span>Settings</span></a>
             </li>
+            <li class="{{ Request::is('system-info*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('system-info.index') }}"><i class="fas fa-info-circle"></i> <span>System Info</span></a>
+            </li>
             @endif
 
             <!-- profile ganti password -->
