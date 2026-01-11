@@ -18,6 +18,32 @@
                 <a class="nav-link" href="{{ url('hakakses') }}"><i class="fas fa-user-shield"></i> <span>Hak Akses</span></a>
             </li>
             @endif
+
+            <!-- New Features Menu -->
+            <li class="menu-header">Features</li>
+            <li class="{{ Request::is('notifications*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('notifications.index') }}">
+                    <i class="fas fa-bell"></i> 
+                    <span>Notifications</span>
+                    @if(auth()->user()->unreadNotifications->count() > 0)
+                        <span class="badge badge-danger">{{ auth()->user()->unreadNotifications->count() }}</span>
+                    @endif
+                </a>
+            </li>
+            <li class="{{ Request::is('file-manager*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('file-manager.index') }}"><i class="fas fa-folder"></i> <span>File Manager</span></a>
+            </li>
+
+            @if (Auth::user()->role == 'superadmin')
+            <li class="menu-header">Admin Tools</li>
+            <li class="{{ Request::is('activity-logs*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('activity-logs.index') }}"><i class="fas fa-history"></i> <span>Activity Logs</span></a>
+            </li>
+            <li class="{{ Request::is('settings*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('settings.index') }}"><i class="fas fa-cog"></i> <span>Settings</span></a>
+            </li>
+            @endif
+
             <!-- profile ganti password -->
             <li class="menu-header">Profile</li>
             <li class="{{ Request::is('profile/edit') ? 'active' : '' }}">
