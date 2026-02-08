@@ -1,0 +1,39 @@
+@extends('layouts.app')
+
+@section('title', 'Create {{ modelTitle }}')
+
+@section('content')
+<section class="section">
+    <div class="section-header">
+        <h1>Create {{ modelTitle }}</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item"><a href="{{ route('{{ routeName }}.index') }}">{{ modelTitle }}</a></div>
+            <div class="breadcrumb-item">Create</div>
+        </div>
+    </div>
+
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>New {{ modelTitle }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="{{ route('{{ routeName }}.store') }}" method="POST">
+                            @csrf
+                            
+{{ formFields }}
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Create</button>
+                                <a href="{{ route('{{ routeName }}.index') }}" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection

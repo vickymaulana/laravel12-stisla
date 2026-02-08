@@ -1,0 +1,83 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\{{ model }};
+use Illuminate\Http\Request;
+
+class {{ model }}Controller extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        ${{ modelVariable }}s = {{ model }}::latest()->paginate(10);
+        return view('{{ viewPath }}.index', compact('{{ modelVariable }}s'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('{{ viewPath }}.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+{{ validation }}
+        ]);
+
+        {{ model }}::create($validated);
+
+        return redirect()->route('{{ routeName }}.index')
+            ->with('success', '{{ model }} created successfully.');
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show({{ model }} ${{ modelVariable }})
+    {
+        return view('{{ viewPath }}.show', compact('{{ modelVariable }}'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit({{ model }} ${{ modelVariable }})
+    {
+        return view('{{ viewPath }}.edit', compact('{{ modelVariable }}'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, {{ model }} ${{ modelVariable }})
+    {
+        $validated = $request->validate([
+{{ validation }}
+        ]);
+
+        ${{ modelVariable }}->update($validated);
+
+        return redirect()->route('{{ routeName }}.index')
+            ->with('success', '{{ model }} updated successfully.');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy({{ model }} ${{ modelVariable }})
+    {
+        ${{ modelVariable }}->delete();
+
+        return redirect()->route('{{ routeName }}.index')
+            ->with('success', '{{ model }} deleted successfully.');
+    }
+}

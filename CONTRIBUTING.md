@@ -55,6 +55,36 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 - Ensure all tests pass before submitting PR
 - Run `php artisan test` to execute test suite
 
+### Using Generator Commands
+
+When adding new features, leverage the built-in generators to maintain consistency:
+
+**For New Models:**
+```bash
+# 1. Create model and migration
+php artisan make:model YourModel -m
+
+# 2. Define migration fields and run it
+php artisan migrate
+
+# 3. Generate seeder and factory
+php artisan make:seeder-factory YourModel
+
+# 4. If CRUD needed, generate with Stisla UI
+php artisan make:crud-stisla YourModel
+```
+
+**Benefits:**
+- ✅ Ensures consistent code style across the project
+- ✅ Follows established Stisla UI patterns
+- ✅ Reduces boilerplate code
+- ✅ Faster development
+
+**Customizing for Your Feature:**
+- Generated code is a starting point - customize as needed
+- Follow the existing pattern in stub templates
+- Update stubs if you identify a better pattern for the project
+
 ## Community
 
 - Be respectful and inclusive
