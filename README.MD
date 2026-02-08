@@ -60,6 +60,142 @@ A modern, production-ready Laravel 12 admin panel template integrated with the b
 |--------------|------------|
 | ![Edit](img/edit.png) | ![Blank](img/blank.png) |
 
+## ⚡ Code Generator Commands
+
+Speed up your development with built-in generator commands! Create seeders, factories, and complete CRUD functionality in seconds.
+
+### 🎲 Seeder & Factory Generator
+
+Automatically generate database seeders and factories for your models with smart field detection.
+
+**Command:**
+```bash
+php artisan make:seeder-factory {ModelName}
+```
+
+**Features:**
+- ✅ Auto-detects fields from migrations
+- ✅ Maps field types to appropriate Faker methods
+- ✅ Handles relationships (belongsTo, hasMany)
+- ✅ Fallback to model's fillable properties
+- ✅ Custom field definitions support
+
+**Example:**
+```bash
+# Generate seeder and factory for User model
+php artisan make:seeder-factory User
+
+# With custom fields
+php artisan make:seeder-factory Product --fields="name:string,price:decimal,stock:integer"
+```
+
+**Generated Files:**
+- `database/factories/UserFactory.php`
+- `database/seeders/UserSeeder.php`
+
+### 🎨 CRUD Generator with Stisla UI
+
+Generate complete CRUD (Create, Read, Update, Delete) functionality with beautiful Stisla UI components.
+
+**Command:**
+```bash
+php artisan make:crud-stisla {ModelName}
+```
+
+**Features:**
+- ✅ Generates resource controller with all CRUD methods
+- ✅ Creates 4 Blade views (index, create, edit, show)
+- ✅ Pre-styled with Stisla Bootstrap components
+- ✅ Auto-detects field types for proper form inputs
+- ✅ Includes validation rules
+- ✅ Appends routes to web.php
+- ✅ Supports custom fields and exclusions
+
+**Example:**
+```bash
+# Generate CRUD for Product model
+php artisan make:crud-stisla Product
+
+# With custom fields
+php artisan make:crud-stisla Product --fields="name:string,price:decimal,description:text"
+
+# Exclude specific fields
+php artisan make:crud-stisla Product --except="id,created_at,updated_at"
+```
+
+**Generated Files:**
+- `app/Http/Controllers/ProductController.php`
+- `resources/views/products/index.blade.php`
+- `resources/views/products/create.blade.php`
+- `resources/views/products/edit.blade.php`
+- `resources/views/products/show.blade.php`
+- Route entry in `routes/web.php`
+
+### 🎯 Field Type Mapping
+
+The generators intelligently map database types to appropriate components:
+
+| Database Type | Factory (Faker) | Form Input | Display |
+|--------------|-----------------|------------|---------|
+| string       | sentence()      | text       | text    |
+| text         | paragraph()     | textarea   | text    |
+| integer      | numberBetween() | number     | number  |
+| decimal      | randomFloat()   | number     | currency|
+| boolean      | boolean()       | checkbox   | badge   |
+| date         | date()          | date       | formatted|
+| datetime     | dateTime()      | datetime   | formatted|
+
+### 🛠️ Customizing Stubs
+
+Want to customize the generated code? Publish and edit the stub templates:
+
+```bash
+# Stub files are located in:
+stubs/
+├── seeder.stub
+├── factory.stub
+├── controller-stisla.stub
+├── view-index-stisla.stub
+├── view-create-stisla.stub
+├── view-edit-stisla.stub
+└── view-show-stisla.stub
+```
+
+Edit these files to match your project's coding standards and patterns!
+
+### 📖 Common Workflow
+
+```bash
+# 1. Create your model and migration
+php artisan make:model Product -m
+
+# 2. Define fields in migration and run it
+php artisan migrate
+
+# 3. Generate seeder and factory
+php artisan make:seeder-factory Product
+
+# 4. Generate CRUD interface
+php artisan make:crud-stisla Product
+
+# 5. Test your new CRUD at /products
+php artisan serve
+```
+
+### ⚠️ Troubleshooting Generators
+
+**Issue:** "Model does not exist"
+- **Solution:** Make sure your model file exists in `app/Models/`
+
+**Issue:** "No fields detected"
+- **Solution:** Either create a migration first, or use `--fields` option to specify fields manually
+
+**Issue:** "Route already exists"
+- **Solution:** The route is already in `routes/web.php` - check and remove duplicate if needed
+
+**Issue:** Generated views don't match your layout
+- **Solution:** Customize the stub files in `stubs/` directory
+
 ## 🛠️ Tech Stack
 
 ### Backend

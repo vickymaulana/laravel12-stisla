@@ -107,6 +107,10 @@ php artisan migrate       # Run migrations
 php artisan migrate:fresh # Fresh migration
 php artisan tinker        # Laravel REPL
 
+# Code Generators (⚡ Fast Development!)
+php artisan make:seeder-factory ModelName    # Generate seeder & factory
+php artisan make:crud-stisla ModelName       # Generate full CRUD
+
 # Maintenance
 php artisan cache:clear   # Clear cache
 composer dump-autoload    # Reload classes
@@ -115,6 +119,51 @@ composer dump-autoload    # Reload classes
 # Production
 npm run build             # Build for production
 php artisan optimize      # Optimize Laravel
+```
+
+## ⚡ Fast Development with Generators
+
+Create complete features in minutes!
+
+### Example: Building a Blog Post CRUD
+
+```bash
+# 1. Create model and migration
+php artisan make:model Post -m
+
+# 2. Edit migration (add title:string, content:text, etc.)
+# Then run:
+php artisan migrate
+
+# 3. Generate seeder and factory (auto-detects fields!)
+php artisan make:seeder-factory Post
+
+# 4. Generate complete CRUD with beautiful UI
+php artisan make:crud-stisla Post
+
+# Done! Visit /posts to see your new CRUD
+```
+
+**What gets generated:**
+- ✅ Controller with all CRUD methods
+- ✅ 4 views (index, create, edit, show) with Stisla UI
+- ✅ Routes automatically added
+- ✅ Factory with field-appropriate faker data
+- ✅ Seeder ready to populate test data
+
+**Time saved**: What takes 2 hours manually → Done in 2 minutes!
+
+### Generator Options
+
+```bash
+# With custom fields
+php artisan make:seeder-factory Product --fields="name:string,price:decimal"
+
+# Exclude certain fields from forms
+php artisan make:crud-stisla Product --except="id,created_at,updated_at"
+
+# Combine both commands for full setup
+php artisan make:seeder-factory Product && php artisan make:crud-stisla Product
 ```
 
 ## 🔐 Default Routes

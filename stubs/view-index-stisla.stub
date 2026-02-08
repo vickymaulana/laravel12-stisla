@@ -1,0 +1,79 @@
+@extends('layouts.app')
+
+@section('title', '{{ modelTitle }} List')
+
+@section('content')
+<section class="section">
+    <div class="section-header">
+        <h1>{{ modelTitle }}</h1>
+        <div class="section-header-button">
+            <a href="{{ route('{{ routeName }}.create') }}" class="btn btn-primary">Add New</a>
+        </div>
+    </div>
+
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>All {{ modelTitle }}</h4>
+                    </div>
+                    <div class="card-body">
+                        @if(session('success'))
+                            <div class="alert alert-success alert-dismissible show fade">
+                                <div class="alert-body">
+                                    <button class="close" data-dismiss="alert">
+                                        <span>&times;</span>
+                                    </button>
+                                    {{ session('success') }}
+                                </div>
+                            </div>
+                        @endif
+
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+{{ tableHeaders }}
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse(${{ modelVariable }}s as ${{ modelVariable }})
+                                        <tr>
+{{ tableColumns }}
+                                            <td>
+                                                <a href="{{ route('{{ routeName }}.show', ${{ modelVariable }}) }}" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{{ route('{{ routeName }}.edit', ${{ modelVariable }}) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <form action="{{ route('{{ routeName }}.destroy', ${{ modelVariable }}) }}" method="POST" style="display: inline-block;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="{{ columnCount }}" class="text-center">No data available</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-3">
+                            {{ ${{ modelVariable }}s->links() }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection
