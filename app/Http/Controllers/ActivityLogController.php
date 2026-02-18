@@ -74,13 +74,22 @@ class ActivityLogController extends Controller
      */
     public function clear(Request $request)
     {
-        if ($request->has('confirm') && $request->confirm === 'yes') {
-            ActivityLog::truncate();
+        $request->validate([
+            'confirm' => 'required|string|in:CLEAR',
+            'retention_days' => 'nullable|integer|min:0|max:3650',
+        ]);
+
+        $retentionDays = (int) $request->input('retention_days', 0);
+
+        if ($retentionDays > 0) {
+            ActivityLog::where('created_at', '<=', now()->subDays($retentionDays))->delete();
             return redirect()->route('activity-logs.index')
-                ->with('success', 'All activity logs cleared successfully.');
+                ->with('success', "Activity logs older than {$retentionDays} day(s) were cleared.");
         }
 
+        ActivityLog::truncate();
+
         return redirect()->route('activity-logs.index')
-            ->with('error', 'Confirmation required to clear all logs.');
+            ->with('success', 'All activity logs cleared successfully.');
     }
 }

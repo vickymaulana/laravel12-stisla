@@ -13,8 +13,7 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
-    <!-- Bootstrap CSS (Bootstrap 4) -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
@@ -26,6 +25,7 @@
     <link rel="stylesheet" href="{{ asset('css/skins/reverse.css') }}">
 
     <!-- Additional CSS (if any) -->
+    @stack('style')
     @stack('css')
 </head>
 <body>
@@ -38,21 +38,21 @@
             @include('components.sidebar')
 
             <!-- Main Content -->
-            <div class="main-content">
-                @yield('content')
-            </div>
+            @hasSection('main')
+                @yield('main')
+            @else
+                <div class="main-content">
+                    @yield('content')
+                </div>
+            @endif
 
             <!-- Footer -->
             @include('components.footer')
         </div>
     </div>
 
-    <!-- jQuery and Popper.js (required for Bootstrap 4) -->
+    <!-- jQuery (required by Stisla scripts) -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
-
-    <!-- Bootstrap JS (Bootstrap 4) -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <!-- Custom JS Libraries -->
     <script src="{{ asset('library/jquery.nicescroll/dist/jquery.nicescroll.min.js') }}"></script>
@@ -62,6 +62,27 @@
     <script src="{{ asset('js/stisla.js') }}"></script>
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+
+    <script>
+        // Compatibility shim for older Bootstrap 4 data attributes in existing templates.
+        document.querySelectorAll('[data-toggle]').forEach((el) => {
+            if (!el.hasAttribute('data-bs-toggle')) {
+                el.setAttribute('data-bs-toggle', el.getAttribute('data-toggle'));
+            }
+        });
+
+        document.querySelectorAll('[data-target]').forEach((el) => {
+            if (!el.hasAttribute('data-bs-target')) {
+                el.setAttribute('data-bs-target', el.getAttribute('data-target'));
+            }
+        });
+
+        document.querySelectorAll('[data-dismiss]').forEach((el) => {
+            if (!el.hasAttribute('data-bs-dismiss')) {
+                el.setAttribute('data-bs-dismiss', el.getAttribute('data-dismiss'));
+            }
+        });
+    </script>
 
     <!-- Additional JS (if any) -->
     @stack('scripts')

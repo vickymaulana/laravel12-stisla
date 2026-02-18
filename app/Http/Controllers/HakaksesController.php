@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\hakakses;
+use App\Models\Hakakses;
 use Illuminate\Http\Request;
 
 class HakaksesController extends Controller
@@ -15,9 +15,9 @@ class HakaksesController extends Controller
         //
         $search = $request->get('search');
         if ($search) {
-            $data['hakakses'] = hakakses::where('id', 'like', "%{$search}%")->get();
+            $data['hakakses'] = Hakakses::where('id', 'like', "%{$search}%")->get();
         } else {
-            $data['hakakses'] = hakakses::all();
+            $data['hakakses'] = Hakakses::all();
         }
 
         return view('layouts.hakakses.index', $data);
@@ -42,7 +42,7 @@ class HakaksesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(hakakses $hakakses)
+    public function show(Hakakses $hakakses)
     {
         //
     }
@@ -53,7 +53,7 @@ class HakaksesController extends Controller
     public function edit($id)
     {
         //
-        $hakakses = hakakses::find($id);
+        $hakakses = Hakakses::find($id);
 
         return view('layouts.hakakses.edit', compact('hakakses'));
     }
@@ -61,10 +61,10 @@ class HakaksesController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, hakakses $hakakses, $id)
+    public function update(Request $request, Hakakses $hakakses, $id)
     {
         //
-        $hakakses = hakakses::find($id);
+        $hakakses = Hakakses::find($id);
         $hakakses->role = $request->role;
         $hakakses->save();
 
@@ -74,7 +74,7 @@ class HakaksesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(hakakses $hakakses)
+    public function destroy(Hakakses $hakakses)
     {
         //
         $hakakses->delete();

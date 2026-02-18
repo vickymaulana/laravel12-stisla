@@ -81,7 +81,7 @@ class NotificationController extends Controller
     public function unreadCount()
     {
         return response()->json([
-            'count' => auth()->user()->unreadNotifications->count()
+            'count' => auth()->user()->unreadNotifications()->count()
         ]);
     }
 
@@ -92,6 +92,7 @@ class NotificationController extends Controller
     {
         $notifications = auth()->user()
             ->notifications()
+            ->latest()
             ->take(5)
             ->get();
 

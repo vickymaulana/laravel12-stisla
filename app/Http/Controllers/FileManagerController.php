@@ -7,6 +7,7 @@ use App\Models\ActivityLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class FileManagerController extends Controller
 {
@@ -15,7 +16,7 @@ class FileManagerController extends Controller
      */
     public function index(Request $request)
     {
-        $folder = $request->get('folder', '/');
+        $folder = $this->normalizeFolder($request->get('folder', '/'));
         
         $query = File::where('user_id', auth()->id())
             ->where('folder', $folder)
@@ -62,11 +63,11 @@ class FileManagerController extends Controller
     {
         $request->validate([
             'files' => 'required',
-            'files.*' => 'file|max:10240', // Max 10MB
+            'files.*' => 'file|max:10240|mimetypes:image/jpeg,image/png,image/gif,image/webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain,application/zip,application/x-rar-compressed',
             'folder' => 'nullable|string',
         ]);
 
-        $folder = $request->get('folder', '/');
+        $folder = $this->normalizeFolder($request->get('folder', '/'));
         $uploadedFiles = [];
 
         foreach ($request->file('files') as $file) {
@@ -114,7 +115,7 @@ class FileManagerController extends Controller
             $file
         );
 
-        return Storage::download($file->path, $file->original_name);
+        return Storage::disk('public')->download($file->path, $file->original_name);
     }
 
     /**
@@ -131,7 +132,10 @@ class FileManagerController extends Controller
             'is_public' => 'boolean',
         ]);
 
-        $file->update($request->only(['original_name', 'description', 'folder', 'is_public']));
+        $validated = $request->only(['original_name', 'description', 'is_public']);
+        $validated['folder'] = $this->normalizeFolder((string) $request->input('folder', '/'));
+
+        $file->update($validated);
 
         ActivityLog::log(
             'File updated: ' . $file->original_name,
@@ -152,8 +156,8 @@ class FileManagerController extends Controller
         $file = File::where('user_id', auth()->id())->findOrFail($id);
         
         // Delete physical file
-        if (Storage::exists($file->path)) {
-            Storage::delete($file->path);
+        if (Storage::disk('public')->exists($file->path)) {
+            Storage::disk('public')->delete($file->path);
         }
 
         $fileName = $file->original_name;
@@ -186,27 +190,52 @@ class FileManagerController extends Controller
     public function createFolder(Request $request)
     {
         $request->validate([
-            'folder_name' => 'required|string|max:255',
+            'folder_name' => 'required|string|max:100|regex:/^[a-zA-Z0-9 _.-]+$/',
             'parent_folder' => 'nullable|string',
         ]);
 
-        $parentFolder = $request->get('parent_folder', '/');
-        $folderPath = $parentFolder === '/' 
-            ? '/' . $request->folder_name 
-            : $parentFolder . '/' . $request->folder_name;
+        $parentFolder = $this->normalizeFolder($request->get('parent_folder', '/'));
+        $folderPath = $this->normalizeFolder(trim($parentFolder . '/' . $request->folder_name));
 
         // Create a placeholder file to represent the folder
         File::create([
             'user_id' => auth()->id(),
             'name' => '.folder',
             'original_name' => $request->folder_name,
-            'path' => 'folders/' . Str::random(40),
+            'path' => 'folders/' . Str::random(40) . '.placeholder',
             'mime_type' => 'folder',
             'size' => 0,
             'folder' => $folderPath,
         ]);
 
+        Storage::disk('public')->makeDirectory('uploads' . $folderPath);
+
         return redirect()->route('file-manager.index', ['folder' => $folderPath])
             ->with('success', 'Folder created successfully.');
+    }
+
+    /**
+     * Normalize user-provided folder path to reduce traversal risk.
+     */
+    private function normalizeFolder(?string $folder): string
+    {
+        $folder = trim((string) $folder);
+
+        if ($folder === '' || $folder === '/') {
+            return '/';
+        }
+
+        $folder = str_replace('\\', '/', $folder);
+        $parts = array_filter(explode('/', $folder), static fn ($part) => $part !== '' && $part !== '.');
+
+        foreach ($parts as $part) {
+            if ($part === '..') {
+                throw ValidationException::withMessages([
+                    'folder' => 'Invalid folder path.',
+                ]);
+            }
+        }
+
+        return '/' . implode('/', $parts);
     }
 }
