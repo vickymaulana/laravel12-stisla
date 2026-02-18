@@ -1,6 +1,13 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ExampleController;
+use App\Http\Controllers\FileManagerController;
+use App\Http\Controllers\HakaksesController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -9,60 +16,71 @@ Route::get('/', function () {
 
 Auth::routes();
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::middleware('auth')->group(function () {
+    Route::get('/home', [HomeController::class, 'index'])->name('home');
+    Route::get('/blank-page', [HomeController::class, 'blank'])->name('blank');
+    Route::view('/quick-tour', 'layouts.quick-tour')->name('quick-tour');
+
+    // Profile
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/change-password', [ProfileController::class, 'changepassword'])->name('profile.change-password');
     Route::put('/profile/password', [ProfileController::class, 'password'])->name('profile.password');
-    Route::get('/blank-page', [App\Http\Controllers\HomeController::class, 'blank'])->name('blank');
 
-    Route::get('/hakakses', [App\Http\Controllers\HakaksesController::class, 'index'])->name('hakakses.index')->middleware('superadmin');
-    Route::get('/hakakses/edit/{id}', [App\Http\Controllers\HakaksesController::class, 'edit'])->name('hakakses.edit')->middleware('superadmin');
-    Route::put('/hakakses/update/{id}', [App\Http\Controllers\HakaksesController::class, 'update'])->name('hakakses.update')->middleware('superadmin');
-    Route::delete('/hakakses/delete/{id}', [App\Http\Controllers\HakaksesController::class, 'destroy'])->name('hakakses.delete')->middleware('superadmin');
+    // Role access management
+    Route::middleware('superadmin')->group(function () {
+        Route::get('/hakakses', [HakaksesController::class, 'index'])->name('hakakses.index');
+        Route::get('/hakakses/edit/{id}', [HakaksesController::class, 'edit'])->name('hakakses.edit');
+        Route::put('/hakakses/update/{id}', [HakaksesController::class, 'update'])->name('hakakses.update');
+        Route::delete('/hakakses/delete/{id}', [HakaksesController::class, 'destroy'])->name('hakakses.delete');
 
-    Route::get('/table-example', [App\Http\Controllers\ExampleController::class, 'table'])->name('table.example');
-    Route::get('/clock-example', [App\Http\Controllers\ExampleController::class, 'clock'])->name('clock.example');
-    Route::get('/chart-example', [App\Http\Controllers\ExampleController::class, 'chart'])->name('chart.example');
-    Route::get('/form-example', [App\Http\Controllers\ExampleController::class, 'form'])->name('form.example');
-    Route::get('/map-example', [App\Http\Controllers\ExampleController::class, 'map'])->name('map.example');
-    Route::get('/calendar-example', [App\Http\Controllers\ExampleController::class, 'calendar'])->name('calendar.example');
-    Route::get('/gallery-example', [App\Http\Controllers\ExampleController::class, 'gallery'])->name('gallery.example');
-    Route::get('/todo-example', [App\Http\Controllers\ExampleController::class, 'todo'])->name('todo.example');
-    Route::get('/contact-example', [App\Http\Controllers\ExampleController::class, 'contact'])->name('contact.example');
-    Route::get('/faq-example', [App\Http\Controllers\ExampleController::class, 'faq'])->name('faq.example');
-    Route::get('/news-example', [App\Http\Controllers\ExampleController::class, 'news'])->name('news.example');
-    Route::get('/about-example', [App\Http\Controllers\ExampleController::class, 'about'])->name('about.example');
+        // Activity logs
+        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('activity-logs.index');
+        Route::get('/activity-logs/{id}', [ActivityLogController::class, 'show'])->name('activity-logs.show');
+        Route::delete('/activity-logs/{id}', [ActivityLogController::class, 'destroy'])->name('activity-logs.destroy');
+        Route::delete('/activity-logs', [ActivityLogController::class, 'clear'])->name('activity-logs.clear');
 
-    // Activity Logs Routes
-    Route::get('/activity-logs', [App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index')->middleware('superadmin');
-    Route::get('/activity-logs/{id}', [App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-logs.show')->middleware('superadmin');
-    Route::delete('/activity-logs/{id}', [App\Http\Controllers\ActivityLogController::class, 'destroy'])->name('activity-logs.destroy')->middleware('superadmin');
-    Route::delete('/activity-logs', [App\Http\Controllers\ActivityLogController::class, 'clear'])->name('activity-logs.clear')->middleware('superadmin');
+        // Settings
+        Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+        Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
+        Route::post('/settings/reset', [SettingController::class, 'reset'])->name('settings.reset');
 
-    // Settings Routes
-    Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index'])->name('settings.index')->middleware('superadmin');
-    Route::put('/settings', [App\Http\Controllers\SettingController::class, 'update'])->name('settings.update')->middleware('superadmin');
-    Route::post('/settings', [App\Http\Controllers\SettingController::class, 'store'])->name('settings.store')->middleware('superadmin');
-    Route::post('/settings/reset', [App\Http\Controllers\SettingController::class, 'reset'])->name('settings.reset')->middleware('superadmin');
+        // Notification admin actions
+        Route::get('/notifications/create', [NotificationController::class, 'create'])->name('notifications.create');
+        Route::post('/notifications/send', [NotificationController::class, 'send'])->name('notifications.send');
+    });
 
-    // Notifications Routes
-    Route::get('/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{id}/mark-as-read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
-    Route::post('/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
-    Route::delete('/notifications/{id}', [App\Http\Controllers\NotificationController::class, 'destroy'])->name('notifications.destroy');
-    Route::delete('/notifications', [App\Http\Controllers\NotificationController::class, 'destroyAll'])->name('notifications.destroy-all');
-    Route::get('/notifications/send-test', [App\Http\Controllers\NotificationController::class, 'sendTest'])->name('notifications.send-test');
-    Route::get('/notifications/create', [App\Http\Controllers\NotificationController::class, 'create'])->name('notifications.create')->middleware('superadmin');
-    Route::post('/notifications/send', [App\Http\Controllers\NotificationController::class, 'send'])->name('notifications.send')->middleware('superadmin');
+    // Template examples
+    Route::get('/table-example', [ExampleController::class, 'table'])->name('table.example');
+    Route::get('/clock-example', [ExampleController::class, 'clock'])->name('clock.example');
+    Route::get('/chart-example', [ExampleController::class, 'chart'])->name('chart.example');
+    Route::get('/form-example', [ExampleController::class, 'form'])->name('form.example');
+    Route::get('/map-example', [ExampleController::class, 'map'])->name('map.example');
+    Route::get('/calendar-example', [ExampleController::class, 'calendar'])->name('calendar.example');
+    Route::get('/gallery-example', [ExampleController::class, 'gallery'])->name('gallery.example');
+    Route::get('/todo-example', [ExampleController::class, 'todo'])->name('todo.example');
+    Route::get('/contact-example', [ExampleController::class, 'contact'])->name('contact.example');
+    Route::get('/faq-example', [ExampleController::class, 'faq'])->name('faq.example');
+    Route::get('/news-example', [ExampleController::class, 'news'])->name('news.example');
+    Route::get('/about-example', [ExampleController::class, 'about'])->name('about.example');
 
-    // File Manager Routes
-    Route::get('/file-manager', [App\Http\Controllers\FileManagerController::class, 'index'])->name('file-manager.index');
-    Route::post('/file-manager/upload', [App\Http\Controllers\FileManagerController::class, 'upload'])->name('file-manager.upload');
-    Route::get('/file-manager/{id}/download', [App\Http\Controllers\FileManagerController::class, 'download'])->name('file-manager.download');
-    Route::put('/file-manager/{id}', [App\Http\Controllers\FileManagerController::class, 'update'])->name('file-manager.update');
-    Route::delete('/file-manager/{id}', [App\Http\Controllers\FileManagerController::class, 'destroy'])->name('file-manager.destroy');
-    Route::get('/file-manager/{id}/show', [App\Http\Controllers\FileManagerController::class, 'show'])->name('file-manager.show');
-    Route::post('/file-manager/create-folder', [App\Http\Controllers\FileManagerController::class, 'createFolder'])->name('file-manager.create-folder');
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    Route::get('/notifications/recent', [NotificationController::class, 'recent'])->name('notifications.recent');
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::delete('/notifications', [NotificationController::class, 'destroyAll'])->name('notifications.destroy-all');
+    Route::get('/notifications/send-test', [NotificationController::class, 'sendTest'])->name('notifications.send-test');
+
+    // File manager
+    Route::get('/file-manager', [FileManagerController::class, 'index'])->name('file-manager.index');
+    Route::post('/file-manager/upload', [FileManagerController::class, 'upload'])->name('file-manager.upload');
+    Route::get('/file-manager/{id}/download', [FileManagerController::class, 'download'])->name('file-manager.download');
+    Route::put('/file-manager/{id}', [FileManagerController::class, 'update'])->name('file-manager.update');
+    Route::delete('/file-manager/{id}', [FileManagerController::class, 'destroy'])->name('file-manager.destroy');
+    Route::get('/file-manager/{id}/show', [FileManagerController::class, 'show'])->name('file-manager.show');
+    Route::post('/file-manager/create-folder', [FileManagerController::class, 'createFolder'])->name('file-manager.create-folder');
 });

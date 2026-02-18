@@ -21,7 +21,8 @@ class OtpPasswordResetNotification extends Notification
      * 
      * @var string
      */
-    private $otp;
+    private string $otp;
+    private int $expireMinutes;
 
     /**
      * Create a new notification instance
@@ -29,9 +30,10 @@ class OtpPasswordResetNotification extends Notification
      * @param string $otp The one-time password for password reset
      * @return void
      */
-    public function __construct($otp)
+    public function __construct(string $otp, int $expireMinutes = 10)
     {
         $this->otp = $otp;
+        $this->expireMinutes = $expireMinutes;
     }
 
     /**
@@ -61,8 +63,9 @@ class OtpPasswordResetNotification extends Notification
     {
         return (new MailMessage)
             ->subject('Password Reset OTP')
-            ->line('Your OTP for password reset is: ' . $this->otp)
-            ->line('Please use this OTP to reset your password.')
+            ->line('Your OTP code is: ' . $this->otp)
+            ->line('This code expires in ' . $this->expireMinutes . ' minute(s).')
+            ->line('Use this OTP together with your reset token link.')
             ->action('Reset Password', url('/password/reset'))
             ->line('If you did not request this, please ignore this email.');
     }

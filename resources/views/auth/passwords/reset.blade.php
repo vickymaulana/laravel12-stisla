@@ -28,7 +28,7 @@
                         </div>
 
                         <!-- OTP Field (if PASSWORD_RESET_METHOD is otp) -->
-                        @if (env('PASSWORD_RESET_METHOD') === 'otp')
+                        @if (env('PASSWORD_RESET_METHOD', 'token') === 'otp')
                         <div class="row mb-3">
                             <label for="otp" class="col-md-4 col-form-label text-md-end">{{ __('OTP') }}</label>
                             <div class="col-md-6">
@@ -38,6 +38,7 @@
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
+                                <small class="text-muted">Enter the 6-digit OTP sent to your email.</small>
                             </div>
                         </div>
                         @endif

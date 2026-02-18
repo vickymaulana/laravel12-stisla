@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
-use Illuminate\Support\Facades\Notification;
-use Illuminate\Http\Request;
 use App\Models\User;
 use App\Notifications\OtpPasswordResetNotification;
+use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Password;
 
 class ForgotPasswordController extends Controller
 {
@@ -18,38 +21,52 @@ class ForgotPasswordController extends Controller
      */
     public function sendResetLinkEmail(Request $request)
     {
-        // Validate the email address input
         $this->validateEmail($request);
 
-        // If OTP is enabled, handle OTP logic
-        if (env('PASSWORD_RESET_METHOD') === 'otp') {
-            return $this->sendOtp($request->email);
+        $response = $this->broker()->sendResetLink(
+            $this->credentials($request)
+        );
+
+        if ($response === Password::RESET_LINK_SENT) {
+            if ($this->usesOtpReset()) {
+                $this->sendOtp((string) $request->email);
+            }
+
+            return $this->sendResetLinkResponse($request, $response);
         }
 
-        // Fallback to the default password reset link via email
-        return parent::sendResetLinkEmail($request);
+        return $this->sendResetLinkFailedResponse($request, $response);
     }
 
     /**
-     * Handle sending OTP for password reset.
+     * Handle sending OTP for password reset as an additional verification step.
      */
-    protected function sendOtp($email)
+    protected function sendOtp(string $email): void
     {
         $user = User::where('email', $email)->first();
 
         if (!$user) {
-            return back()->withErrors(['email' => 'No user found with this email address.']);
+            return;
         }
 
-        // Generate an OTP
-        $otp = rand(100000, 999999);
+        $otp = (string) random_int(100000, 999999);
+        $expireMinutes = max(1, (int) env('PASSWORD_RESET_OTP_EXPIRE', 10));
+        $cacheKey = $this->otpCacheKey($email);
 
-        // Send OTP via email using the notification
-        Notification::route('mail', $email)->notify(new OtpPasswordResetNotification($otp));
+        Cache::put($cacheKey, Hash::make($otp), now()->addMinutes($expireMinutes));
+        Notification::route('mail', $email)->notify(new OtpPasswordResetNotification($otp, $expireMinutes));
+    }
 
-        // Optionally store the OTP in the session for validation later
-        session(['otp' => $otp, 'email' => $email]);
+    /**
+     * Determine whether OTP protection is enabled.
+     */
+    protected function usesOtpReset(): bool
+    {
+        return env('PASSWORD_RESET_METHOD', 'token') === 'otp';
+    }
 
-        return back()->with('status', 'OTP has been sent to your email address.');
+    protected function otpCacheKey(string $email): string
+    {
+        return 'password-reset:otp:' . sha1(strtolower($email));
     }
 }

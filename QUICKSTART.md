@@ -1,204 +1,72 @@
-# Quick Start Guide - Laravel 12 Stisla
+# Quick Start (5-10 Minutes)
 
-Welcome to Laravel 12 Stisla Template! This guide will get you started in minutes.
-
-## 🚀 Installation (5 Minutes)
-
-### Step 1: Clone & Navigate
+## 1) Install
 ```bash
 git clone https://github.com/vickymaulana/laravel12-stisla.git
 cd laravel12-stisla
-```
-
-### Step 2: Install Dependencies
-```bash
 composer install
 npm install
 ```
 
-### Step 3: Setup Environment
+## 2) Configure app
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-### Step 4: Configure Database
-Edit `.env` file:
-```env
-DB_DATABASE=laravel_stisla
-DB_USERNAME=root
-DB_PASSWORD=your_password
-```
-
-### Step 5: Run Migrations
+Edit database config in `.env`, then run:
 ```bash
 php artisan migrate
 ```
 
-### Step 6: Build & Serve
+Optional:
 ```bash
-# Terminal 1: Frontend assets
-npm run dev
+php artisan db:seed
+php artisan storage:link
+```
 
-# Terminal 2: Laravel server
+## 3) Run app
+```bash
+npm run dev
 php artisan serve
 ```
 
-Visit: **http://localhost:8000** 🎉
+Open `http://localhost:8000`.
 
-## 📝 First Steps
+## 4) First login flow
+1. Register at `/register`
+2. Login at `/login`
+3. Go to `/quick-tour`
 
-1. **Register Account**: `/register`
-2. **Explore Dashboard**: After login, you'll see the dashboard
-3. **Edit Profile**: Click your name → Edit Profile
-4. **Try Examples**: Check the sidebar for template examples
-
-## 🎓 Learning Path
-
-1. **Week 1**: Routes & Controllers → [LEARNING.md](LEARNING.md)
-2. **Week 2**: Database & Models
-3. **Week 3**: Views & Authentication
-4. **Week 4**: Advanced Features
-
-## 📚 Documentation Files
-
-- **[README.md](README.MD)** - Full documentation
-- **[LEARNING.md](LEARNING.md)** - Step-by-step learning guide
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute
-- **[CHANGELOG.md](CHANGELOG.md)** - What's new
-
-## 🆘 Need Help?
-
-**Common Issues:**
-- Permission errors? Run: `chmod -R 775 storage bootstrap/cache`
-- Assets not loading? Run: `npm run build`
-- Database errors? Check your `.env` file
-
-**Get Support:**
-- Read the [README.md](README.MD)
-- Check [Laravel Docs](https://laravel.com/docs)
-- Open an [Issue](https://github.com/vickymaulana/laravel12-stisla/issues)
-
-## ✨ What's Included?
-
-### Features
-- ✅ Authentication (Login/Register)
-- ✅ User Profile Management
-- ✅ Role-based Access Control
-- ✅ Password Reset with OTP
-- ✅ Responsive Dashboard
-- ✅ 12+ Example Pages
-
-### Tech Stack
-- Laravel 12 (Latest)
-- Bootstrap 5.3.3
-- Vite 6.0.5
-- PHP 8.2+
-
-## 🎯 Quick Commands
-
+## 5) Superadmin quick setup
+Create/update one user role to `superadmin` (via DB or tinker):
 ```bash
-# Development
-php artisan serve          # Start server
-npm run dev               # Build assets (watch mode)
-
-# Database
-php artisan migrate       # Run migrations
-php artisan migrate:fresh # Fresh migration
-php artisan tinker        # Laravel REPL
-
-# Code Generators (⚡ Fast Development!)
-php artisan make:seeder-factory ModelName    # Generate seeder & factory
-php artisan make:crud-stisla ModelName       # Generate full CRUD
-
-# Maintenance
-php artisan cache:clear   # Clear cache
-composer dump-autoload    # Reload classes
-./vendor/bin/pint         # Fix code style
-
-# Production
-npm run build             # Build for production
-php artisan optimize      # Optimize Laravel
+php artisan tinker
+```
+```php
+App\Models\User::where('email', 'your@email.com')->update(['role' => 'superadmin']);
 ```
 
-## ⚡ Fast Development with Generators
-
-Create complete features in minutes!
-
-### Example: Building a Blog Post CRUD
-
-```bash
-# 1. Create model and migration
-php artisan make:model Post -m
-
-# 2. Edit migration (add title:string, content:text, etc.)
-# Then run:
-php artisan migrate
-
-# 3. Generate seeder and factory (auto-detects fields!)
-php artisan make:seeder-factory Post
-
-# 4. Generate complete CRUD with beautiful UI
-php artisan make:crud-stisla Post
-
-# Done! Visit /posts to see your new CRUD
+## 6) Password reset mode
+Default mode in `.env`:
+```env
+PASSWORD_RESET_METHOD=token
+```
+Optional OTP hardening:
+```env
+PASSWORD_RESET_METHOD=otp
+PASSWORD_RESET_OTP_EXPIRE=10
+PASSWORD_RESET_OTP_MAX_ATTEMPTS=5
 ```
 
-**What gets generated:**
-- ✅ Controller with all CRUD methods
-- ✅ 4 views (index, create, edit, show) with Stisla UI
-- ✅ Routes automatically added
-- ✅ Factory with field-appropriate faker data
-- ✅ Seeder ready to populate test data
-
-**Time saved**: What takes 2 hours manually → Done in 2 minutes!
-
-### Generator Options
-
+## 7) Sanity checks
 ```bash
-# With custom fields
-php artisan make:seeder-factory Product --fields="name:string,price:decimal"
-
-# Exclude certain fields from forms
-php artisan make:crud-stisla Product --except="id,created_at,updated_at"
-
-# Combine both commands for full setup
-php artisan make:seeder-factory Product && php artisan make:crud-stisla Product
+php artisan route:list --except-vendor
+php artisan test
 ```
 
-## 🔐 Default Routes
-
-| Route | Purpose | Auth Required |
-|-------|---------|---------------|
-| `/` | Welcome page | No |
-| `/register` | User registration | No |
-| `/login` | User login | No |
-| `/home` | Dashboard | Yes |
-| `/profile/edit` | Edit profile | Yes |
-| `/hakakses` | Access management | Yes (Superadmin) |
-
-## 🎨 Template Examples
-
-Explore these pages to see Stisla components:
-- `/table-example` - DataTables
-- `/chart-example` - Charts & graphs
-- `/form-example` - Form components
-- `/map-example` - Google Maps
-- `/calendar-example` - Event calendar
-- `/gallery-example` - Image gallery
-- And more!
-
-## 📖 Next Steps
-
-After setup:
-1. 🎓 Follow the [LEARNING.md](LEARNING.md) guide
-2. 🔍 Explore the example pages
-3. 💻 Try modifying code
-4. 🚀 Build your own feature
-5. 🤝 Contribute back!
-
----
-
-**Happy coding!** 💻✨
-
-For detailed documentation, see [README.md](README.MD)
+## Common Problems
+- Assets missing: run `npm run dev` or `npm run build`
+- Download/upload issue: run `php artisan storage:link`
+- OTP not sent: verify `MAIL_*` config
+- Route list crash: check custom controller syntax/imports

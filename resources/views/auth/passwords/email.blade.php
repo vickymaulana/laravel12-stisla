@@ -15,6 +15,12 @@
                         </div>
                     @endif
 
+                    @if (env('PASSWORD_RESET_METHOD', 'token') === 'otp')
+                        <div class="alert alert-info" role="alert">
+                            Password reset requires link token and OTP email verification.
+                        </div>
+                    @endif
+
                     <form method="POST" action="{{ route('password.email') }}">
                         @csrf
 

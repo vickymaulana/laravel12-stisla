@@ -24,6 +24,12 @@
                     Monitor and track all user activities in the system.
                 </p>
 
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        {{ $errors->first() }}
+                    </div>
+                @endif
+
                 <div class="row">
                     <div class="col-12">
                         <div class="card">
@@ -97,7 +103,7 @@
                             <div class="card-header">
                                 <h4>Activity Logs</h4>
                                 <div class="card-header-action">
-                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#clearLogsModal">
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#clearLogsModal">
                                         <i class="fas fa-trash"></i> Clear All Logs
                                     </button>
                                 </div>
@@ -176,24 +182,30 @@
     </div>
 
     <!-- Clear Logs Modal -->
-    <div class="modal fade" id="clearLogsModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="clearLogsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Clear All Logs</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form method="POST" action="{{ route('activity-logs.clear') }}">
                     @csrf
                     @method('DELETE')
                     <div class="modal-body">
                         <p>Are you sure you want to clear all activity logs? This action cannot be undone.</p>
-                        <input type="hidden" name="confirm" value="yes">
+                        <div class="form-group">
+                            <label for="retention_days">Retention (days, optional)</label>
+                            <input id="retention_days" type="number" min="0" max="3650" class="form-control" name="retention_days" value="0">
+                            <small class="text-muted">Set value greater than 0 to only clear older logs.</small>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label for="confirm">Type <strong>CLEAR</strong> to confirm</label>
+                            <input id="confirm" type="text" name="confirm" class="form-control" required>
+                        </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-danger">Clear All Logs</button>
                     </div>
                 </form>

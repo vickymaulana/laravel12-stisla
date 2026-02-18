@@ -17,7 +17,11 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-.github
+.github/*
+.github/prompts/
+.github/skills/
+!.github/workflows/
+!.github/workflows/*.yml
 openspec
 # OS Files
 .DS_Store
