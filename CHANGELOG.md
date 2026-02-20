@@ -2,6 +2,41 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0] - 2026-02-20
+
+### 🐛 Fixed (Critical)
+- Fixed `HakaksesController.destroy()` — broken model binding, no redirect after delete
+- Fixed `HakaksesController.update()` — unused parameter, no validation, no success message
+- Fixed `HakaksesController.index()` — search by `id LIKE` replaced with name/email search
+- Fixed `ProfileController.update()` — added validation (name required, email unique)
+- Fixed `SettingController.update()` — boolean checkboxes now properly save unchecked state
+- Fixed `SettingController` — removed dead `destroy()` method with no route
+- Fixed `User` model — added `role` to `$fillable` for mass assignment
+- Fixed `PasswordResetFlowTest` — test helper now uses `config()` instead of `putenv()`
+
+### 🔄 Refactored
+- **Removed `Hakakses` model** — redundant proxy to `users` table, replaced with `User` model
+- **Removed `ActivityLogger` helper** — duplicated `ActivityLog::log()`, moved convenience methods to `ActivityLog` model
+- Removed redundant constructor `middleware('auth')` from `HomeController` and `ExampleController`
+- Replaced `env()` with `config()` in `ForgotPasswordController` and `ResetPasswordController`
+- Added `password_reset_method`, `password_reset_otp_expire`, `password_reset_otp_max_attempts` to `config/auth.php`
+- Used `$request->only()` instead of `$request->all()` in `SettingController.store()` for security
+- Standardized all flash message keys to `'success'` (was mixed: `status`, `message`, `success`)
+- Replaced free-text role input with `<select>` dropdown in hakakses edit view
+- Added PHPDoc comments to all controllers and models
+
+### 🌐 Localization
+- Translated all Indonesian UI text to English for community use:
+  - Sidebar: "Hak Akses" → "Role Access", "Ganti Password" → "Change Password"
+  - Header: "Hai" → "Hi", "Selamat Datang" → "Welcome"
+  - Change Password form: all labels translated
+  - Hakakses views: complete English rewrite with proper breadcrumbs
+
+### ✅ Verified
+- `php artisan route:list` — 60 routes, no errors
+- `php artisan test` — 7 tests, 18 assertions, all passed
+- `npm run build` — built successfully
+
 ## [Unreleased] - 2026-01-09
 
 ### ✨ Added
@@ -115,10 +150,10 @@ If you're updating from a previous version:
 - [ ] Advanced role and permission system
 - [ ] Email verification
 - [ ] Two-factor authentication
-- [ ] User activity logging
+- [x] User activity logging
 - [ ] Advanced dashboard with widgets
-- [ ] File upload management
-- [ ] Notification center
+- [x] File upload management
+- [x] Notification center
 - [ ] Dark mode support
 - [ ] Multi-language support (i18n)
 

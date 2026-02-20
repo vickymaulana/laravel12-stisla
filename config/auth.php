@@ -112,4 +112,18 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Password Reset Method
+    |--------------------------------------------------------------------------
+    |
+    | This option controls the password reset method used by the application.
+    | Supported: "token" (default Laravel flow), "otp" (token + OTP code).
+    |
+    */
+
+    'password_reset_method' => env('PASSWORD_RESET_METHOD', 'token'),
+    'password_reset_otp_expire' => env('PASSWORD_RESET_OTP_EXPIRE', 10),
+    'password_reset_otp_max_attempts' => env('PASSWORD_RESET_OTP_MAX_ATTEMPTS', 5),
+
 ];

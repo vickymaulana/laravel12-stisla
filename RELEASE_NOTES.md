@@ -195,14 +195,14 @@ Need help? Here's how:
 - [ ] Two-factor authentication
 - [ ] Advanced role & permission system
 - [ ] Email verification
-- [ ] Activity logging
+- [x] Activity logging ✅
 
 ### Planned for v3.0.0
 - [ ] Multi-language support (i18n)
 - [ ] Dark mode theme
 - [ ] Advanced dashboard widgets
-- [ ] File management system
-- [ ] Real-time notifications
+- [x] File management system ✅
+- [x] Real-time notifications ✅
 
 ## 📝 Changelog
 

@@ -34,7 +34,7 @@ class ActivityLog extends Model
     }
 
     /**
-     * Get the model that the activity log belongs to.
+     * Get the related model (polymorphic).
      */
     public function model()
     {
@@ -42,9 +42,9 @@ class ActivityLog extends Model
     }
 
     /**
-     * Log an activity
+     * Log a general activity.
      */
-    public static function log($description, $subject = null, $event = 'custom', $model = null, $properties = [])
+    public static function log(string $description, ?string $subject = null, string $event = 'custom', $model = null, array $properties = []): static
     {
         return static::create([
             'user_id' => auth()->id(),
@@ -54,6 +54,68 @@ class ActivityLog extends Model
             'model_type' => $model ? get_class($model) : null,
             'model_id' => $model?->id,
             'properties' => $properties,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    /**
+     * Log user login.
+     */
+    public static function logLogin($user): static
+    {
+        return static::create([
+            'user_id' => $user->id,
+            'subject' => 'User Login',
+            'description' => $user->name . ' logged into the system',
+            'event' => 'login',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    /**
+     * Log user logout.
+     */
+    public static function logLogout($user): static
+    {
+        return static::create([
+            'user_id' => $user->id,
+            'subject' => 'User Logout',
+            'description' => $user->name . ' logged out from the system',
+            'event' => 'logout',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    /**
+     * Log profile update.
+     */
+    public static function logProfileUpdate($user): static
+    {
+        return static::create([
+            'user_id' => $user->id,
+            'subject' => 'Profile Updated',
+            'description' => $user->name . ' updated their profile',
+            'event' => 'updated',
+            'model_type' => get_class($user),
+            'model_id' => $user->id,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+        ]);
+    }
+
+    /**
+     * Log password change.
+     */
+    public static function logPasswordChange($user): static
+    {
+        return static::create([
+            'user_id' => $user->id,
+            'subject' => 'Password Changed',
+            'description' => $user->name . ' changed their password',
+            'event' => 'updated',
             'ip_address' => request()->ip(),
             'user_agent' => request()->userAgent(),
         ]);

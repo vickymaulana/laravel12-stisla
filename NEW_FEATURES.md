@@ -19,9 +19,6 @@ Track all user activities and system events with a comprehensive logging system.
 **Files:**
 - Migration: `database/migrations/2026_01_11_000001_create_activity_logs_table.php`
 - Model: `app/Models/ActivityLog.php`
-- Controller: `app/Http/Controllers/ActivityLogController.php`
-- Views: `resources/views/activity-logs/`
-- Helper: `app/Helpers/ActivityLogger.php`
 
 **Usage:**
 ```php
@@ -233,17 +230,23 @@ use App\Models\ActivityLog;
 
 public function store(Request $request)
 {
-    $item = Item::create($request->all());
-    
+    $item = Item::create($request->validated());
+
     ActivityLog::log(
         'New item created: ' . $item->name,
         'Items Management',
         'created',
         $item
     );
-    
+
     return redirect()->back();
 }
+
+// Convenience methods are also available:
+ActivityLog::logLogin($user);
+ActivityLog::logLogout($user);
+ActivityLog::logProfileUpdate($user);
+ActivityLog::logPasswordChange($user);
 ```
 
 ### Send Notification
@@ -401,5 +404,6 @@ Potential features to add:
 ---
 
 **Created:** January 11, 2026
-**Version:** 1.0.0
+**Last Updated:** February 20, 2026
+**Version:** 1.1.0
 **Laravel Version:** 12.x

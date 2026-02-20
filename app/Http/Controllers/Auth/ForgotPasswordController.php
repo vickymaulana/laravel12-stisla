@@ -50,7 +50,7 @@ class ForgotPasswordController extends Controller
         }
 
         $otp = (string) random_int(100000, 999999);
-        $expireMinutes = max(1, (int) env('PASSWORD_RESET_OTP_EXPIRE', 10));
+        $expireMinutes = max(1, (int) config('auth.password_reset_otp_expire', 10));
         $cacheKey = $this->otpCacheKey($email);
 
         Cache::put($cacheKey, Hash::make($otp), now()->addMinutes($expireMinutes));
@@ -62,9 +62,12 @@ class ForgotPasswordController extends Controller
      */
     protected function usesOtpReset(): bool
     {
-        return env('PASSWORD_RESET_METHOD', 'token') === 'otp';
+        return config('auth.password_reset_method', 'token') === 'otp';
     }
 
+    /**
+     * Get the cache key for the OTP.
+     */
     protected function otpCacheKey(string $email): string
     {
         return 'password-reset:otp:' . sha1(strtolower($email));
