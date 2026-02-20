@@ -33,6 +33,7 @@ This repository extends the default Laravel application skeleton with:
 - Role-based access middleware (`superadmin`)
 - File manager, notifications, activity logs, and dynamic settings
 - Starter code generators for CRUD and seeder/factory scaffolding
+- Clean code architecture with proper validation, consistent conventions, and full English localization
 
 The goal is to reduce boilerplate so developers can start building business features faster.
 
@@ -173,9 +174,13 @@ Supported options include custom fields and excluded fields.
 app/
   Console/Commands/           # Custom generators
   Http/Controllers/           # Feature controllers
+  Http/Controllers/Auth/      # Authentication controllers
   Http/Middleware/            # Access middleware
   Models/                     # Eloquent models
   Notifications/              # Notification classes
+
+config/
+  auth.php                    # Auth + OTP password reset config
 
 resources/
   views/                      # Blade templates
@@ -191,8 +196,8 @@ database/
   factories/                  # Factories
 
 tests/
-  Feature/
-  Unit/
+  Feature/                    # Feature tests
+  Unit/                       # Unit tests
 ```
 
 ## Testing and Quality

@@ -71,8 +71,6 @@ class PasswordResetFlowTest extends TestCase
 
     private function setResetMethod(string $method): void
     {
-        putenv("PASSWORD_RESET_METHOD={$method}");
-        $_ENV['PASSWORD_RESET_METHOD'] = $method;
-        $_SERVER['PASSWORD_RESET_METHOD'] = $method;
+        config(['auth.password_reset_method' => $method]);
     }
 }

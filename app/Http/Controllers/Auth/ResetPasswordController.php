@@ -94,7 +94,7 @@ class ResetPasswordController extends Controller
      */
     protected function usesOtpReset(): bool
     {
-        return env('PASSWORD_RESET_METHOD', 'token') === 'otp';
+        return config('auth.password_reset_method', 'token') === 'otp';
     }
 
     /**
@@ -104,7 +104,7 @@ class ResetPasswordController extends Controller
     {
         $email = strtolower((string) $request->email);
         $attemptKey = $this->otpAttemptKey($email, $request->ip());
-        $maxAttempts = max(1, (int) env('PASSWORD_RESET_OTP_MAX_ATTEMPTS', 5));
+        $maxAttempts = max(1, (int) config('auth.password_reset_otp_max_attempts', 5));
 
         if (RateLimiter::tooManyAttempts($attemptKey, $maxAttempts)) {
             return false;
@@ -131,11 +131,17 @@ class ResetPasswordController extends Controller
         RateLimiter::clear($this->otpAttemptKey($normalizedEmail));
     }
 
+    /**
+     * Get the cache key for the OTP.
+     */
     protected function otpCacheKey(string $email): string
     {
         return 'password-reset:otp:' . sha1($email);
     }
 
+    /**
+     * Get the rate limiter key for OTP attempts.
+     */
     protected function otpAttemptKey(string $email, ?string $ip = null): string
     {
         return 'password-reset:otp-attempt:' . sha1($email . '|' . ($ip ?? 'unknown'));

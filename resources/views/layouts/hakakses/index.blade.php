@@ -1,79 +1,115 @@
 @extends('layouts.app')
 
-@section('title', 'Hak Akses')
+@section('title', 'Role Access')
 
 @push('style')
     <!-- CSS Libraries -->
 @endpush
 
-@section('content')
-    <div class="main-content">
-        <section class="section">
-            <div class="section-header">
-                <h1>Hak Akses</h1>
+@section('main')
+<div class="main-content">
+    <section class="section">
+        <div class="section-header">
+            <h1>Role Access</h1>
+            <div class="section-header-breadcrumb">
+                <div class="breadcrumb-item active"><a href="{{ route('home') }}">Dashboard</a></div>
+                <div class="breadcrumb-item">Role Access</div>
             </div>
-            @if (session('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
+        </div>
+
+        <div class="section-body">
+            <h2 class="section-title">Manage User Roles</h2>
+            <p class="section-lead">
+                Assign roles and manage access rights for users.
+            </p>
+
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
             @endif
-            @if (session('error'))
-                <div class="alert alert-danger">
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     {{ session('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
             @endif
-            <div class="section-body">
-                <div class="table-responsive">
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <form action="{{ route('hakakses.index') }}" method="GET">
-                                <div class="input-group">
-                                    <input type="text" name="search" class="form-control" placeholder="Cari Berdasarkan ID...">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary" style="margin-left:5px;" type="submit">Search</button>
+
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>Users</h4>
+                            <div class="card-header-action">
+                                <form method="GET" action="{{ route('hakakses.index') }}">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" placeholder="Search by name or email..." name="search" value="{{ request('search') }}">
+                                        <div class="input-group-btn">
+                                            <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                                        </div>
                                     </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">#</th>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th class="text-center">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($hakakses as $index => $user)
+                                            <tr>
+                                                <td class="text-center">{{ $index + 1 }}</td>
+                                                <td>{{ $user->name }}</td>
+                                                <td>{{ $user->email }}</td>
+                                                <td>
+                                                    <span class="badge badge-{{ $user->role === 'superadmin' ? 'danger' : 'primary' }}">
+                                                        {{ ucfirst($user->role) }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a href="{{ route('hakakses.edit', $user->id) }}" class="btn btn-sm btn-info">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </a>
+                                                    <form action="{{ route('hakakses.delete', $user->id) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">
+                                                            <i class="fas fa-trash"></i> Delete
+                                                        </button>
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center py-4">No users found.</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nama</th>
-                                <th>Email</th>
-                                <th>Role</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($hakakses as $item)
-                                <tr>
-                                    <td>{{ $item->id }}</td>
-                                    <td>{{ $item->name }}</td>
-                                    <td>{{ $item->email }}</td>
-                                    <td>{{ $item->role }}</td>
-
-                                    <td>
-                                        <a href="{{ route('hakakses.edit', $item->id) }}" class="btn btn-primary">Edit</a>
-                                        <form action="{{ route('hakakses.delete', $item->id) }}" method="POST" style="display: inline-block;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                        </form>
-                                    </td> <!-- Add Edit and Delete buttons for each row -->
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
+    </section>
+</div>
 @endsection
 
 @push('scripts')
     <!-- JS Libraries -->
-
-    <!-- Page Specific JS File -->
 @endpush
