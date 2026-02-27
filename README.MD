@@ -55,8 +55,9 @@
 - **Laravel 12 + PHP 8.2+** — latest framework with modern PHP features
 - **Authentication** via Laravel UI (login, register, password reset)
 - **User Profile Management** — edit profile & change password
-- **Role Access Control** — `superadmin` middleware with role management UI
+- **Role & Permission Management** — powered by Spatie Laravel Permission
 - **Responsive Admin Layout** — Stisla dashboard with Bootstrap 5
+- **Dark/Light Theme Toggle** — persisted in browser storage
 - **Route Grouping** — organized by domain for readability and maintenance
 
 ## Advanced Features
@@ -74,7 +75,7 @@
 ### Notifications (`/notifications`)
 - List, mark as read, mark all read, delete notifications
 - Admin notification sending to selected users
-- AJAX endpoints for real-time badge count and dropdown
+- Livewire unread badge component with periodic polling
 
 ### File Manager (`/file-manager`)
 - Upload, download, rename, and delete files with ownership checks
@@ -92,6 +93,8 @@
 | PHP | ≥ 8.2 | Runtime |
 | Laravel | 12.x | Framework |
 | Laravel UI | 4.x | Authentication scaffolding |
+| Livewire | 3.x | Reactive Blade components |
+| Spatie Permission | 6.x | Role and permission management |
 | PHPUnit | 11.x | Testing |
 | Laravel Pint | 1.x | Code style |
 
@@ -135,6 +138,7 @@ php artisan key:generate
 
 # Database
 php artisan migrate
+php artisan db:seed
 php artisan storage:link
 
 # Development server
@@ -153,7 +157,8 @@ php artisan tinker
 ```
 
 ```php
-App\Models\User::where('email', 'your@email.com')->update(['role' => 'superadmin']);
+$user = App\Models\User::where('email', 'your@email.com')->first();
+$user?->assignRole('superadmin');
 ```
 
 ---
@@ -243,6 +248,7 @@ app/
   Http/Controllers/           # Feature controllers
   Http/Controllers/Auth/      # Authentication controllers
   Http/Middleware/            # Access middleware (Superadmin)
+  Livewire/                   # Livewire components (e.g. NotificationBadge)
   Models/                     # Eloquent models (User, File, Setting, ActivityLog)
   Notifications/              # Notification classes (GeneralNotification)
   Providers/                  # Service providers
@@ -252,10 +258,11 @@ bootstrap/
 
 config/
   auth.php                    # Auth + OTP password reset configuration
+  permission.php              # Spatie role/permission configuration
 
 resources/
   views/                      # Blade templates (Stisla layout)
-  css/                        # Vite CSS entry
+  sass/                       # Vite SCSS entry
   js/                         # Vite JS entry
 
 routes/
@@ -337,6 +344,9 @@ Run `php artisan storage:link` to create the public storage symlink.
 ### Frontend changes not reflected
 - Use `npm run dev` during development for hot-reload
 - Use `npm run build` for production assets
+
+### `Unable to locate file in Vite manifest: resources/css/app.css`
+Use SCSS entry in Blade: `@vite(['resources/sass/app.scss', 'resources/js/app.js'])`, then rebuild assets.
 
 ---
 

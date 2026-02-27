@@ -20,7 +20,7 @@ class HakaksesController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = User::query();
+        $query = User::with('roles');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -55,11 +55,10 @@ class HakaksesController extends Controller
         ]);
 
         $user = User::findOrFail($id);
-        $user->role = $request->role;
-        $user->save();
+        $user->syncRoles([$request->role]);
 
         ActivityLog::log(
-            "Role updated for {$user->name} to {$user->role}",
+            "Role updated for {$user->name} to {$request->role}",
             'Role Access',
             'updated',
             $user

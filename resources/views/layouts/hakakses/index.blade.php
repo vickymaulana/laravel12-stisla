@@ -76,8 +76,9 @@
                                                 <td>{{ $user->name }}</td>
                                                 <td>{{ $user->email }}</td>
                                                 <td>
-                                                    <span class="badge badge-{{ $user->role === 'superadmin' ? 'danger' : 'primary' }}">
-                                                        {{ ucfirst($user->role) }}
+                                                    @php($roleName = $user->getRoleNames()->first() ?? 'user')
+                                                    <span class="badge badge-{{ $user->hasRole('superadmin') ? 'danger' : 'primary' }}">
+                                                        {{ ucfirst($roleName) }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">

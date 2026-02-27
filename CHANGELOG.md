@@ -2,6 +2,40 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0] - 2026-02-27
+
+### 🚀 Added
+- Added **Livewire v3** integration and registered Livewire assets in the main layout
+- Added **Spatie Laravel Permission** package with published config (`config/permission.php`)
+- Added role/permission schema migration (`create_permission_tables`)
+- Added role migration path from legacy `users.role` into Spatie pivot tables
+- Added `RolePermissionSeeder` with default roles (`superadmin`, `user`) and starter permissions
+- Added dark mode infrastructure:
+  - Theme toggle in navbar (persisted in `localStorage`)
+  - `public/css/dark-mode.css` overrides for Stisla components
+  - Early theme bootstrap script to avoid flash of wrong theme
+- Added Livewire `NotificationBadge` component (polling unread count)
+
+### 🔄 Changed
+- Migrated authorization checks from `Auth::user()->role` to Spatie role APIs (`hasRole`, Blade `@role`)
+- Updated `User` model to use `HasRoles` trait and removed `role` from `$fillable`
+- Updated `HakaksesController` and role access views to use `syncRoles()` and role collections
+- Updated registration flow to assign default `user` role on account creation
+- Updated middleware aliases in `bootstrap/app.php` to include `role`, `permission`, and `role_or_permission`
+- Updated base controller to extend Laravel routing controller so auth controllers can use `$this->middleware()`
+- Updated Vite + Blade entry consistency (`resources/sass/app.scss`) to fix manifest lookup issues
+- Updated Vite Sass config to silence dependency deprecation noise during build
+
+### ⚠️ Breaking Changes
+- Legacy `users.role` column is now deprecated and dropped by migration path
+- Access control now depends on Spatie role tables (`roles`, `model_has_roles`, etc.)
+- Existing deployments must run new migrations and seeders before using admin role features
+
+### ✅ Verified
+- `php artisan test` — all tests pass
+- `npm run build` — production assets build successfully
+- Dark mode text contrast and override order validated in the main layout pages
+
 ## [2.2.0] - 2026-02-27
 
 ### 🔄 Clean Code & Modernization
@@ -182,14 +216,14 @@ If you're updating from a previous version:
 
 ### Planned for Next Release
 - [ ] API authentication with Laravel Sanctum
-- [ ] Advanced role and permission system
+- [x] Advanced role and permission system
 - [ ] Email verification
 - [ ] Two-factor authentication
 - [x] User activity logging
 - [ ] Advanced dashboard with widgets
 - [x] File upload management
 - [x] Notification center
-- [ ] Dark mode support
+- [x] Dark mode support
 - [ ] Multi-language support (i18n)
 
 ## Support

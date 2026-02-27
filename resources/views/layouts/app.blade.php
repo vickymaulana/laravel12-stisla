@@ -13,7 +13,18 @@
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme ?? (prefersDark ? 'dark' : 'light');
+
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
+
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @livewireStyles
 
     <!-- Font Awesome CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
@@ -23,6 +34,7 @@
     <link rel="stylesheet" href="{{ asset('css/components.css') }}">
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     <link rel="stylesheet" href="{{ asset('css/skins/reverse.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
 
     <!-- Additional CSS (if any) -->
     @stack('style')
@@ -62,6 +74,7 @@
     <script src="{{ asset('js/stisla.js') }}"></script>
     <script src="{{ asset('js/scripts.js') }}"></script>
     <script src="{{ asset('js/custom.js') }}"></script>
+    @livewireScripts
 
     <script>
         // Compatibility shim for older Bootstrap 4 data attributes in existing templates.

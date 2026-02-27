@@ -8,6 +8,22 @@
 
     <!-- Right Side Navbar Items -->
     <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <a
+                href="#"
+                class="nav-link nav-link-lg"
+                title="Toggle theme"
+                x-data="{ dark: document.documentElement.getAttribute('data-bs-theme') === 'dark' }"
+                @click.prevent="
+                    dark = !dark;
+                    const theme = dark ? 'dark' : 'light';
+                    document.documentElement.setAttribute('data-bs-theme', theme);
+                    localStorage.setItem('theme', theme);
+                "
+            >
+                <i class="fas" :class="dark ? 'fa-sun' : 'fa-moon'"></i>
+            </a>
+        </li>
         <li class="dropdown">
             <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                 <img alt="image" src="{{ asset('img/avatar/avatar-1.png') }}" class="rounded-circle mr-1">

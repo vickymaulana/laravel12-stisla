@@ -47,9 +47,10 @@
 
                                 <div class="form-group">
                                     <label for="role">Role <span class="text-danger">*</span></label>
+                                    @php($selectedRole = $hakakses->getRoleNames()->first() ?? 'user')
                                     <select name="role" id="role" class="form-control @error('role') is-invalid @enderror" required>
-                                        <option value="user" {{ $hakakses->role === 'user' ? 'selected' : '' }}>User</option>
-                                        <option value="superadmin" {{ $hakakses->role === 'superadmin' ? 'selected' : '' }}>Super Admin</option>
+                                        <option value="user" {{ $selectedRole === 'user' ? 'selected' : '' }}>User</option>
+                                        <option value="superadmin" {{ $selectedRole === 'superadmin' ? 'selected' : '' }}>Super Admin</option>
                                     </select>
                                     @error('role')
                                         <div class="invalid-feedback">{{ $message }}</div>
